@@ -1,92 +1,228 @@
-import { FlatList, StyleSheet } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
 
-import { IssueCard } from '@/components/issues';
+import { FilterBar, IssueCard, IssueFilters, SearchBar } from '@/components/issues';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Button } from '@/components/ui/Button';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { IssueService } from '@/services/issues/issueService';
 import { IssueReport, IssueSeverity } from '@/types/models/Issue';
 
 /**
- * Mock data for demonstration purposes
- */
-const MOCK_ISSUES: IssueReport[] = [
-  {
-    id: '1',
-    title: 'Broken pipe in northeast corner',
-    description: 'Water leaking from ceiling in the northeast corner of building A. Damage visible on drywall and carpet is wet.',
-    location: 'Building A, Floor 2, Room 203',
-    timestamp: new Date(2024, 4, 1).toISOString(),
-    severity: IssueSeverity.High,
-    photos: [
-      {
-        id: '1a',
-        uri: 'https://picsum.photos/id/26/400/300',
-        timestamp: new Date(2024, 4, 1).toISOString(),
-        title: 'Ceiling damage',
-      },
-    ],
-  },
-  {
-    id: '2',
-    title: 'Window seal broken',
-    description: 'Window seal appears to be broken, allowing moisture to enter during rainy weather. Window is located on west wall.',
-    location: 'Building B, Floor 1, Room 110',
-    timestamp: new Date(2024, 4, 5).toISOString(),
-    severity: IssueSeverity.Medium,
-    photos: [
-      {
-        id: '2a',
-        uri: 'https://picsum.photos/id/24/400/300',
-        timestamp: new Date(2024, 4, 5).toISOString(),
-      },
-    ],
-  },
-  {
-    id: '3',
-    title: 'Chipping paint on exterior wall',
-    description: 'Paint is chipping and peeling on the south exterior wall, approximately 3 feet from ground level.',
-    location: 'Building C, South Wall',
-    timestamp: new Date(2024, 4, 8).toISOString(),
-    severity: IssueSeverity.Low,
-    photos: [],
-  },
-];
-
-/**
- * Screen for displaying the list of issues
+ * Screen for displaying and filtering issues
  */
 export default function IssuesScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   
+  // State for issues data
+  const [loading, setLoading] = useState(true);
+  const [issues, setIssues] = useState<IssueReport[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  
+  // State for filtering and searching
+  const [filters, setFilters] = useState<IssueFilters>({
+    severity: 'all',
+    sortBy: 'date',
+    sortOrder: 'desc',
+  });
+  const [searchMode, setSearchMode] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Fetch issues on component mount
+  useEffect(() => {
+    const fetchIssues = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await IssueService.getAllIssues();
+        setIssues(data);
+      } catch (err) {
+        setError('Failed to load issues');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchIssues();
+  }, []);
+  
+  // Apply filters and search to issues
+  const filteredIssues = useMemo(() => {
+    let result = [...issues];
+    
+    // Apply severity filter
+    if (filters.severity && filters.severity !== 'all') {
+      result = result.filter(issue => issue.severity === filters.severity);
+    }
+    
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      result = result.filter(issue => 
+        issue.title.toLowerCase().includes(query) ||
+        issue.description.toLowerCase().includes(query) ||
+        issue.location.toLowerCase().includes(query)
+      );
+    }
+    
+    // Apply sorting
+    result.sort((a, b) => {
+      if (filters.sortBy === 'date') {
+        const dateA = new Date(a.timestamp).getTime();
+        const dateB = new Date(b.timestamp).getTime();
+        return filters.sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+      } else if (filters.sortBy === 'severity') {
+        // Convert severity to a numeric value for sorting
+        const severityMap = {
+          [IssueSeverity.High]: 3,
+          [IssueSeverity.Medium]: 2,
+          [IssueSeverity.Low]: 1,
+        };
+        
+        const severityA = severityMap[a.severity];
+        const severityB = severityMap[b.severity];
+        
+        return filters.sortOrder === 'asc' ? severityA - severityB : severityB - severityA;
+      }
+      
+      return 0;
+    });
+    
+    return result;
+  }, [issues, filters, searchQuery]);
+  
+  // Handle filter changes
+  const handleFilterChange = (newFilters: IssueFilters) => {
+    setFilters(newFilters);
+  };
+  
+  // Toggle search mode
+  const toggleSearchMode = () => {
+    setSearchMode(!searchMode);
+    if (searchMode) {
+      setSearchQuery('');
+    }
+  };
+  
+  // Render list item
   const renderItem = ({ item }: { item: IssueReport }) => (
     <IssueCard issue={item} />
   );
   
-  const renderEmptyState = () => (
-    <ThemedView style={styles.emptyContainer}>
-      <IconSymbol size={48} name="exclamationmark.circle" color={colors.icon} />
-      <ThemedText style={styles.emptyText}>No issues reported yet</ThemedText>
-      <Button
-        label="Report an Issue"
-        variant="primary"
-        size="small"
-        style={styles.emptyButton}
-      />
-    </ThemedView>
-  );
+  // Render empty state
+  const renderEmptyState = () => {
+    if (loading) {
+      return (
+        <ThemedView style={styles.emptyContainer}>
+          <ActivityIndicator size="large" color={colors.tint} />
+          <ThemedText style={styles.loadingText}>Loading issues...</ThemedText>
+        </ThemedView>
+      );
+    }
+    
+    if (error) {
+      return (
+        <ThemedView style={styles.emptyContainer}>
+          <IconSymbol size={48} name="exclamationmark.circle" color="#E11D48" />
+          <ThemedText style={styles.errorText}>{error}</ThemedText>
+          <Button
+            label="Retry"
+            variant="primary"
+            size="small"
+            style={styles.emptyButton}
+            onPress={() => {
+              setLoading(true);
+              IssueService.getAllIssues()
+                .then(data => {
+                  setIssues(data);
+                  setError(null);
+                })
+                .catch(err => {
+                  console.error(err);
+                  setError('Failed to load issues');
+                })
+                .finally(() => setLoading(false));
+            }}
+          />
+        </ThemedView>
+      );
+    }
+    
+    if (searchQuery.trim() || filters.severity !== 'all') {
+      return (
+        <ThemedView style={styles.emptyContainer}>
+          <IconSymbol size={48} name="magnifyingglass" color={colors.icon} />
+          <ThemedText style={styles.emptyText}>No issues match your search</ThemedText>
+          <Button
+            label="Clear Filters"
+            variant="primary"
+            size="small"
+            style={styles.emptyButton}
+            onPress={() => {
+              setSearchQuery('');
+              setFilters({
+                severity: 'all',
+                sortBy: 'date',
+                sortOrder: 'desc',
+              });
+            }}
+          />
+        </ThemedView>
+      );
+    }
+    
+    return (
+      <ThemedView style={styles.emptyContainer}>
+        <IconSymbol size={48} name="exclamationmark.circle" color={colors.icon} />
+        <ThemedText style={styles.emptyText}>No issues reported yet</ThemedText>
+        <Button
+          label="Report an Issue"
+          variant="primary"
+          size="small"
+          style={styles.emptyButton}
+        />
+      </ThemedView>
+    );
+  };
   
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.header}>
         <ThemedText type="title">Issues</ThemedText>
+        
+        {!searchMode && (
+          <ThemedText style={styles.issueCount}>
+            {filteredIssues.length} {filteredIssues.length === 1 ? 'issue' : 'issues'}
+          </ThemedText>
+        )}
       </ThemedView>
       
+      {searchMode ? (
+        <ThemedView style={styles.searchContainer}>
+          <SearchBar
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            onCancel={toggleSearchMode}
+            autoFocus
+          />
+        </ThemedView>
+      ) : (
+        <ThemedView style={styles.filtersContainer}>
+          <FilterBar
+            filters={filters}
+            onFiltersChange={handleFilterChange}
+            onSearchPress={toggleSearchMode}
+          />
+        </ThemedView>
+      )}
+      
       <FlatList
-        data={MOCK_ISSUES}
+        data={filteredIssues}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
@@ -105,9 +241,21 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 8,
   },
+  issueCount: {
+    marginTop: 4,
+    color: '#687076',
+  },
+  filtersContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
+  searchContainer: {
+    paddingHorizontal: 16,
+  },
   listContent: {
     padding: 16,
     paddingTop: 8,
+    minHeight: '100%',
   },
   emptyContainer: {
     flex: 1,
@@ -115,11 +263,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 64,
   },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    textAlign: 'center',
+  },
   emptyText: {
     marginTop: 12,
     marginBottom: 24,
     fontSize: 16,
     textAlign: 'center',
+  },
+  errorText: {
+    marginTop: 12,
+    marginBottom: 24,
+    fontSize: 16,
+    textAlign: 'center',
+    color: '#E11D48',
   },
   emptyButton: {
     minWidth: 160,
