@@ -1,5 +1,6 @@
+import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
+import { ActivityIndicator, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 
 import { FilterBar, IssueCard, IssueFilters, SearchBar } from '@/components/issues';
 import { ThemedText } from '@/components/ThemedText';
@@ -17,6 +18,7 @@ import { IssueReport, IssueSeverity } from '@/types/models/Issue';
 export default function IssuesScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
+  const router = useRouter();
   
   // State for issues data
   const [loading, setLoading] = useState(true);
@@ -193,7 +195,13 @@ export default function IssuesScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.header}>
-        <ThemedText type="title">Issues</ThemedText>
+        <ThemedView style={styles.headerRow}>
+          <TouchableOpacity onPress={() => router.push('/')} style={styles.backButton}>
+            <IconSymbol size={20} name="chevron.left" color={colors.text} />
+          </TouchableOpacity>
+
+          <ThemedText type="title">Issues</ThemedText>
+        </ThemedView>
         
         {!searchMode && (
           <ThemedText style={styles.issueCount}>
@@ -240,6 +248,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 8,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    marginRight: 8,
+    padding: 4,
   },
   issueCount: {
     marginTop: 4,

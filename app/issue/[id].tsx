@@ -1,6 +1,9 @@
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
+import Constants from 'expo-constants';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PhotoGallery } from '@/components/photos';
 import { ThemedText } from '@/components/ThemedText';
@@ -111,19 +114,21 @@ export default function IssueDetailScreen() {
   // Render content based on state
   if (loading) {
     return (
-      <ThemedView style={styles.container}>
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="light" />
         {renderBackButton()}
         <ThemedView style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.tint} />
           <ThemedText style={styles.loadingText}>Loading issue details...</ThemedText>
         </ThemedView>
-      </ThemedView>
+      </SafeAreaView>
     );
   }
   
   if (error || !issue) {
     return (
-      <ThemedView style={styles.container}>
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="light" />
         {renderBackButton()}
         <ThemedView style={styles.errorContainer}>
           <IconSymbol 
@@ -136,12 +141,13 @@ export default function IssueDetailScreen() {
             <Button label="View All Issues" variant="primary" />
           </Link>
         </ThemedView>
-      </ThemedView>
+      </SafeAreaView>
     );
   }
   
   return (
-    <ThemedView style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="light" />
       {renderBackButton()}
       
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
@@ -219,13 +225,14 @@ export default function IssueDetailScreen() {
           />
         </ThemedView>
       </ScrollView>
-    </ThemedView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: Constants.statusBarHeight,
   },
   header: {
     paddingHorizontal: 16,

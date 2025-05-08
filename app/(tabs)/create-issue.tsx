@@ -1,4 +1,5 @@
-import { ScrollView, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
+import { ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -15,11 +16,17 @@ import { IssueSeverity } from '@/types/models/Issue';
 export default function CreateIssueScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
+  const router = useRouter();
 
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.header}>
-        <ThemedText type="title">Report an Issue</ThemedText>
+        <ThemedView style={styles.headerRow}>
+          <TouchableOpacity onPress={() => router.push('/')} style={styles.backButton}>
+            <IconSymbol size={20} name="chevron.left" color={colors.text} />
+          </TouchableOpacity>
+          <ThemedText type="title">Report an Issue</ThemedText>
+        </ThemedView>
       </ThemedView>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
@@ -122,6 +129,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 8,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    marginRight: 8,
+    padding: 4,
   },
   scrollView: {
     flex: 1,

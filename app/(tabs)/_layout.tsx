@@ -25,6 +25,11 @@ export default function TabLayout() {
           },
           default: {},
         }),
+        // Override default shadow styling with boxShadow
+        tabBarItemStyle: {
+          // This will replace any deprecated shadowColor, shadowOffset, etc.
+          boxShadow: '0px 2px 3px rgba(0,0,0,0.1)'
+        },
       }}>
       <Tabs.Screen
         name="index"
@@ -38,6 +43,7 @@ export default function TabLayout() {
         options={{
           title: 'Issues',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="exclamationmark.circle.fill" color={color} />,
+          contentStyle: { paddingTop: 16 }, // Add 1rem (16px) top padding
         }}
       />
       <Tabs.Screen
@@ -45,6 +51,7 @@ export default function TabLayout() {
         options={{
           title: 'New Issue',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="plus.circle.fill" color={color} />,
+          contentStyle: { paddingTop: 16 }, // Add 1rem (16px) top padding
         }}
       />
     </Tabs>
