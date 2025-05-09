@@ -1,5 +1,5 @@
 import React, { forwardRef, useState } from 'react';
-import { StyleProp, StyleSheet, TextInput, TextInputProps, ViewStyle } from 'react-native';
+import { TextInput } from 'react-native';
 
 import { Input, InputProps } from '@/components/ui/Input/Input';
 import { ValidationRule, validateField } from '@/utils/validation';
@@ -30,11 +30,6 @@ export interface FormFieldProps extends InputProps {
    * @default 'blur'
    */
   validateOn?: 'blur' | 'change';
-  
-  /**
-   * Custom container style
-   */
-  containerStyle?: StyleProp<ViewStyle>;
 }
 
 /**
@@ -53,6 +48,7 @@ export const FormField = forwardRef<TextInput, FormFieldProps>(
       isError = false,
       onBlur,
       onChangeText,
+      className,
       ...rest
     },
     ref
@@ -97,6 +93,7 @@ export const FormField = forwardRef<TextInput, FormFieldProps>(
         error={displayError}
         isError={hasError}
         required={required}
+        className={className}
         {...rest}
       />
     );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -114,30 +114,32 @@ export function FilterBar({ filters, onFiltersChange, onSearchPress }: FilterBar
   };
   
   return (
-    <ThemedView style={styles.container}>
-      <ThemedView style={styles.row}>
+    <ThemedView className="mb-3">
+      <ThemedView className="flex-row items-center gap-2">
         {/* Search Button */}
         <TouchableOpacity
-          style={[styles.iconButton, { backgroundColor: colorScheme === 'dark' ? '#2A2A2A' : '#F5F5F5' }]}
+          className="w-9 h-9 rounded-full items-center justify-center md:w-10 md:h-10"
+          style={{ backgroundColor: colorScheme === 'dark' ? '#2A2A2A' : '#F5F5F5' }}
           onPress={onSearchPress}
         >
           <IconSymbol name="magnifyingglass" size={20} color={colors.text} />
         </TouchableOpacity>
         
         {/* Severity Filter Pills */}
-        <ThemedView style={styles.filterPills}>
+        <ThemedView className="flex-1 flex-row items-center gap-2 flex-wrap">
           <TouchableOpacity
-            style={[
-              styles.filterPill,
-              isSeveritySelected('all') && styles.selectedPill,
-              { backgroundColor: isSeveritySelected('all') ? colors.tint + '20' : colorScheme === 'dark' ? '#2A2A2A' : '#F5F5F5' }
-            ]}
+            className={`flex-row items-center px-2.5 py-1.5 rounded-full ${isSeveritySelected('all') ? 'border border-[#E4E7EB]' : ''}`}
+            style={{ 
+              backgroundColor: isSeveritySelected('all') ? 
+                colors.tint + '20' : 
+                colorScheme === 'dark' ? '#2A2A2A' : '#F5F5F5' 
+            }}
             onPress={() => toggleSeverity('all')}
           >
-            <ThemedText style={[
-              styles.pillText,
-              isSeveritySelected('all') && { color: colors.tint }
-            ]}>
+            <ThemedText 
+              className="text-xs md:text-sm" 
+              style={isSeveritySelected('all') ? { color: colors.tint } : undefined}
+            >
               All
             </ThemedText>
           </TouchableOpacity>
@@ -145,27 +147,24 @@ export function FilterBar({ filters, onFiltersChange, onSearchPress }: FilterBar
           {Object.values(IssueSeverity).map((severity) => (
             <TouchableOpacity
               key={severity}
-              style={[
-                styles.filterPill,
-                isSeveritySelected(severity) && styles.selectedPill,
-                {
-                  backgroundColor: isSeveritySelected(severity) 
-                    ? `${getSeverityColor(severity)}20` 
-                    : colorScheme === 'dark' ? '#2A2A2A' : '#F5F5F5',
-                }
-              ]}
+              className={`flex-row items-center px-2.5 py-1.5 rounded-full ${isSeveritySelected(severity) ? 'border border-[#E4E7EB]' : ''}`}
+              style={{
+                backgroundColor: isSeveritySelected(severity) 
+                  ? `${getSeverityColor(severity)}20` 
+                  : colorScheme === 'dark' ? '#2A2A2A' : '#F5F5F5',
+              }}
               onPress={() => toggleSeverity(severity)}
             >
               <IconSymbol 
                 name={getSeverityIconName(severity)} 
                 size={14} 
                 color={getSeverityColor(severity)} 
-                style={styles.pillIcon} 
+                style={{ marginRight: 4 }} 
               />
-              <ThemedText style={[
-                styles.pillText,
-                isSeveritySelected(severity) && { color: getSeverityColor(severity) }
-              ]}>
+              <ThemedText 
+                className="text-xs md:text-sm"
+                style={isSeveritySelected(severity) ? { color: getSeverityColor(severity) } : undefined}
+              >
                 {severity}
               </ThemedText>
             </TouchableOpacity>
@@ -174,10 +173,8 @@ export function FilterBar({ filters, onFiltersChange, onSearchPress }: FilterBar
         
         {/* Filter Toggle Button */}
         <TouchableOpacity
-          style={[
-            styles.iconButton, 
-            { backgroundColor: colorScheme === 'dark' ? '#2A2A2A' : '#F5F5F5' }
-          ]}
+          className="w-9 h-9 rounded-full items-center justify-center md:w-10 md:h-10"
+          style={{ backgroundColor: colorScheme === 'dark' ? '#2A2A2A' : '#F5F5F5' }}
           onPress={() => setExpanded(!expanded)}
         >
           <IconSymbol 
@@ -190,36 +187,30 @@ export function FilterBar({ filters, onFiltersChange, onSearchPress }: FilterBar
       
       {/* Expanded Filter Options */}
       {expanded && (
-        <ThemedView style={styles.expandedSection}>
-          <ThemedView style={styles.sortOptions}>
-            <ThemedText style={styles.sectionLabel}>Sort by:</ThemedText>
+        <ThemedView className="mt-3 pt-3 border-t border-[#E4E7EB] dark:border-gray-700">
+          <ThemedView className="flex-row items-center mb-3">
+            <ThemedText className="text-sm mr-2">Sort by:</ThemedText>
             
             <TouchableOpacity
-              style={[
-                styles.sortButton,
-                isSortSelected('date') && styles.selectedSortButton,
-              ]}
+              className={`px-3 py-1.5 rounded ${isSortSelected('date') ? 'bg-[#0086C930]' : ''} mr-2`}
               onPress={() => setSortBy('date')}
             >
-              <ThemedText style={isSortSelected('date') ? styles.selectedSortText : undefined}>
+              <ThemedText className={isSortSelected('date') ? 'text-[#0086C9] font-medium' : ''}>
                 Date
               </ThemedText>
             </TouchableOpacity>
             
             <TouchableOpacity
-              style={[
-                styles.sortButton,
-                isSortSelected('severity') && styles.selectedSortButton,
-              ]}
+              className={`px-3 py-1.5 rounded ${isSortSelected('severity') ? 'bg-[#0086C930]' : ''} mr-2`}
               onPress={() => setSortBy('severity')}
             >
-              <ThemedText style={isSortSelected('severity') ? styles.selectedSortText : undefined}>
+              <ThemedText className={isSortSelected('severity') ? 'text-[#0086C9] font-medium' : ''}>
                 Severity
               </ThemedText>
             </TouchableOpacity>
             
             <TouchableOpacity
-              style={styles.sortOrderButton}
+              className="w-8 h-8 rounded-full items-center justify-center"
               onPress={toggleSortOrder}
             >
               <IconSymbol 
@@ -231,10 +222,10 @@ export function FilterBar({ filters, onFiltersChange, onSearchPress }: FilterBar
           </ThemedView>
           
           <TouchableOpacity
-            style={styles.clearButton}
+            className="self-start"
             onPress={clearFilters}
           >
-            <ThemedText style={styles.clearButtonText}>Clear Filters</ThemedText>
+            <ThemedText className="text-[#0086C9] text-sm">Clear Filters</ThemedText>
           </TouchableOpacity>
         </ThemedView>
       )}
@@ -242,86 +233,4 @@ export function FilterBar({ filters, onFiltersChange, onSearchPress }: FilterBar
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 12,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  filterPills: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    flexWrap: 'wrap',
-  },
-  filterPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  selectedPill: {
-    borderWidth: 1,
-    borderColor: '#E4E7EB',
-  },
-  pillIcon: {
-    marginRight: 4,
-  },
-  pillText: {
-    fontSize: 13,
-  },
-  iconButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  expandedSection: {
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#E4E7EB',
-  },
-  sectionLabel: {
-    fontSize: 14,
-    marginRight: 8,
-  },
-  sortOptions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  sortButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 4,
-    marginRight: 8,
-  },
-  selectedSortButton: {
-    backgroundColor: '#0086C930',
-  },
-  selectedSortText: {
-    color: '#0086C9',
-    fontWeight: '500',
-  },
-  sortOrderButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  clearButton: {
-    alignSelf: 'flex-start',
-  },
-  clearButtonText: {
-    color: '#0086C9',
-    fontSize: 14,
-  },
-});
+

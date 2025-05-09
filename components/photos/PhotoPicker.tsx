@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  StyleSheet,
   View,
   Pressable,
   Modal,
@@ -103,7 +102,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
     
     try {
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaType.Images,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.8,
@@ -139,7 +138,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
     
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaType.Images,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.8,
@@ -172,12 +171,12 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
   };
   
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView className="mb-5">
       {/* Label */}
       {label && (
-        <View style={styles.labelContainer}>
-          <ThemedText style={styles.label}>{label}</ThemedText>
-          {required && <ThemedText style={styles.requiredIndicator}> *</ThemedText>}
+        <View className="flex-row mb-1.5">
+          <ThemedText className="text-sm font-medium">{label}</ThemedText>
+          {required && <ThemedText className="text-[#E11D48] font-medium"> *</ThemedText>}
         </View>
       )}
       
@@ -190,12 +189,12 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
           showsHorizontalScrollIndicator={false}
           renderItem={({ item, index }) => (
             <Pressable 
-              style={styles.photoItem} 
+              className="w-[120px] h-[120px] md:w-[150px] md:h-[150px] rounded-lg mr-2 overflow-hidden relative" 
               onPress={() => viewPhoto(index)}
             >
-              <Image source={{ uri: item.uri }} style={styles.photoThumbnail} />
+              <Image source={{ uri: item.uri }} className="w-full h-full" />
               <Pressable
-                style={styles.removeButton}
+                className="absolute top-1 right-1 z-10 bg-black/30 rounded-full"
                 onPress={() => removePhoto(item.id)}
               >
                 <Ionicons name="close-circle" size={24} color="#E11D48" />
@@ -204,15 +203,17 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
           )}
           ListFooterComponent={
             photos.length < maxPhotos ? (
-              <View style={styles.photoActionsContainer}>
+              <View className="flex-row justify-center items-center gap-4">
                 <Pressable
-                  style={[styles.photoActionButton, { backgroundColor: colors.primary }]}
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-lg items-center justify-center"
+                  style={{ backgroundColor: colors.primary }}
                   onPress={takePhoto}
                 >
                   <Ionicons name="camera" size={24} color="white" />
                 </Pressable>
                 <Pressable
-                  style={[styles.photoActionButton, { backgroundColor: colors.primary }]}
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-lg items-center justify-center"
+                  style={{ backgroundColor: colors.primary }}
                   onPress={pickImage}
                 >
                   <Ionicons name="images" size={24} color="white" />
@@ -223,28 +224,28 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
         />
       ) : (
         <ThemedView 
-          style={[
-            styles.photoPlaceholder,
-            { borderColor: colorScheme === 'dark' ? '#3E4144' : '#9CA3AF' }
-          ]}
+          className="h-[150px] md:h-[180px] rounded-lg border border-dashed items-center justify-center p-4"
+          style={{ borderColor: colorScheme === 'dark' ? '#3E4144' : '#9CA3AF' }}
         >
-          <View style={styles.photoActionsContainer}>
+          <View className="flex-row justify-center items-center gap-4">
             <Pressable
-              style={[styles.photoActionButton, { backgroundColor: colors.primary }]}
+              className="w-20 h-20 md:w-24 md:h-24 rounded-lg items-center justify-center"
+              style={{ backgroundColor: colors.primary }}
               onPress={takePhoto}
             >
               <Ionicons name="camera" size={24} color="white" />
-              <ThemedText style={styles.photoActionText}>Camera</ThemedText>
+              <ThemedText className="text-white mt-1 text-xs">Camera</ThemedText>
             </Pressable>
             <Pressable
-              style={[styles.photoActionButton, { backgroundColor: colors.primary }]}
+              className="w-20 h-20 md:w-24 md:h-24 rounded-lg items-center justify-center"
+              style={{ backgroundColor: colors.primary }}
               onPress={pickImage}
             >
               <Ionicons name="images" size={24} color="white" />
-              <ThemedText style={styles.photoActionText}>Gallery</ThemedText>
+              <ThemedText className="text-white mt-1 text-xs">Gallery</ThemedText>
             </Pressable>
           </View>
-          <ThemedText style={styles.photoPlaceholderText}>
+          <ThemedText className="opacity-50 mt-2 text-center">
             Take or select up to {maxPhotos} photos
           </ThemedText>
         </ThemedView>
@@ -257,9 +258,9 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
         animationType="fade"
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalContainer}>
+        <View className="flex-1 bg-black/90 justify-center items-center">
           <Pressable
-            style={styles.closeButton}
+            className="absolute top-10 right-5 z-10"
             onPress={() => setModalVisible(false)}
           >
             <Ionicons name="close-circle" size={30} color="white" />
@@ -268,7 +269,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
           {selectedPhotoIndex !== null && photos[selectedPhotoIndex] && (
             <Image
               source={{ uri: photos[selectedPhotoIndex].uri }}
-              style={styles.fullScreenImage}
+              className="w-full h-[80%]"
               resizeMode="contain"
             />
           )}
@@ -278,88 +279,4 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 20,
-  },
-  labelContainer: {
-    flexDirection: 'row',
-    marginBottom: 6,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  requiredIndicator: {
-    color: '#E11D48',
-    fontWeight: '500',
-  },
-  photoPlaceholder: {
-    height: 150,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-  },
-  photoPlaceholderText: {
-    opacity: 0.5,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  photoActionsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 16,
-  },
-  photoActionButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  photoActionText: {
-    color: 'white',
-    marginTop: 4,
-    fontSize: 12,
-  },
-  photoItem: {
-    width: 120,
-    height: 120,
-    borderRadius: 8,
-    marginRight: 8,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  photoThumbnail: {
-    width: '100%',
-    height: '100%',
-  },
-  removeButton: {
-    position: 'absolute',
-    top: 4,
-    right: 4,
-    zIndex: 10,
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    borderRadius: 12,
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  fullScreenImage: {
-    width: '100%',
-    height: '80%',
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
-    zIndex: 10,
-  },
-});
+// NativeWind classes replace StyleSheet

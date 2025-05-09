@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import { StyleProp, ViewStyle } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -14,6 +14,7 @@ interface StatisticCardProps {
   iconName?: string;
   iconColor?: string;
   style?: StyleProp<ViewStyle>;
+  className?: string;
 }
 
 /**
@@ -28,51 +29,34 @@ export function StatisticCard({
   iconName,
   iconColor,
   style,
+  className,
 }: StatisticCardProps) {
   return (
-    <ThemedView style={[styles.container, { backgroundColor }, style]}>
-      <ThemedView style={styles.content}>
-        <ThemedText style={[styles.value, valueColor ? { color: valueColor } : undefined]}>
+    <ThemedView 
+      className={`flex-1 min-w-[45%] md:min-w-[30%] lg:min-w-0 rounded-xl p-4 md:p-5 min-h-[100px] md:min-h-[120px] flex-row justify-between ${className || ''}`}
+      style={[{ backgroundColor }, style]}
+    >
+      <ThemedView className="justify-center">
+        <ThemedText 
+          className="text-3xl md:text-4xl font-bold mb-1"
+          style={valueColor ? { color: valueColor } : undefined}
+        >
           {value}
         </ThemedText>
         
-        <ThemedText style={[styles.label, labelColor ? { color: labelColor } : undefined]}>
+        <ThemedText 
+          className="text-sm md:text-base"
+          style={labelColor ? { color: labelColor } : undefined}
+        >
           {label}
         </ThemedText>
       </ThemedView>
       
       {iconName && (
-        <ThemedView style={styles.iconContainer}>
+        <ThemedView className="justify-center opacity-80">
           <IconSymbol name={iconName} size={28} color={iconColor} />
         </ThemedView>
       )}
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    minWidth: '45%',
-    borderRadius: 12,
-    padding: 16,
-    minHeight: 100,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  content: {
-    justifyContent: 'center',
-  },
-  value: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  label: {
-    fontSize: 14,
-  },
-  iconContainer: {
-    justifyContent: 'center',
-    opacity: 0.8,
-  },
-});

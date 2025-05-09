@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { Link } from 'expo-router';
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -70,29 +70,40 @@ export function RecentActivityItem({ issue }: RecentActivityItemProps) {
   return (
     <Link href={{ pathname: '/issue/[id]', params: { id: issue.id } }} asChild>
       <TouchableOpacity activeOpacity={0.7}>
-        <ThemedView style={styles.container}>
-          <ThemedView style={[styles.iconContainer, { backgroundColor: `${getSeverityColor()}20` }]}>
+        <ThemedView className="flex-row items-center py-3 px-1 md:py-4 md:px-3 border-b border-[#E4E7EB] dark:border-gray-700">
+          <ThemedView 
+            className="w-9 h-9 md:w-12 md:h-12 rounded-full items-center justify-center mr-3"
+            style={{ backgroundColor: `${getSeverityColor()}20` }}
+          >
             <IconSymbol 
               name={getSeverityIconName()} 
               size={18} 
+              className="md:scale-125"
               color={getSeverityColor()} 
             />
           </ThemedView>
           
-          <ThemedView style={styles.contentContainer}>
-            <ThemedText type="defaultSemiBold" numberOfLines={1} style={styles.title}>
+          <ThemedView className="flex-1 mr-3">
+            <ThemedText 
+              type="defaultSemiBold" 
+              numberOfLines={1} 
+              className="text-[15px] md:text-base mb-1"
+            >
               {issue.title}
             </ThemedText>
             
-            <ThemedView style={styles.detailsRow}>
-              <ThemedView style={styles.locationContainer}>
+            <ThemedView className="flex-row items-center justify-between">
+              <ThemedView className="flex-row items-center flex-1">
                 <IconSymbol name="mappin.circle.fill" size={12} color={colors.icon} />
-                <ThemedText style={styles.locationText} numberOfLines={1}>
+                <ThemedText 
+                  numberOfLines={1}
+                  className="text-xs md:text-sm ml-1 text-[#687076] dark:text-gray-400"
+                >
                   {issue.location}
                 </ThemedText>
               </ThemedView>
               
-              <ThemedText style={styles.timestamp}>
+              <ThemedText className="text-xs md:text-sm text-[#687076] dark:text-gray-400">
                 {getRelativeTime(issue.timestamp)}
               </ThemedText>
             </ThemedView>
@@ -101,7 +112,7 @@ export function RecentActivityItem({ issue }: RecentActivityItemProps) {
           {issue.photos.length > 0 && (
             <Image
               source={{ uri: issue.photos[0].uri }}
-              style={styles.thumbnail}
+              className="w-12 h-12 md:w-16 md:h-16 rounded-md"
               contentFit="cover"
             />
           )}
@@ -110,54 +121,3 @@ export function RecentActivityItem({ issue }: RecentActivityItemProps) {
     </Link>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 4,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E4E7EB',
-  },
-  iconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  contentContainer: {
-    flex: 1,
-    marginRight: 12,
-  },
-  title: {
-    fontSize: 15,
-    marginBottom: 4,
-  },
-  detailsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  locationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  locationText: {
-    fontSize: 12,
-    marginLeft: 4,
-    color: '#687076',
-  },
-  timestamp: {
-    fontSize: 12,
-    color: '#687076',
-  },
-  thumbnail: {
-    width: 48,
-    height: 48,
-    borderRadius: 6,
-  },
-});

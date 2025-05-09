@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { FlatList, StyleSheet } from 'react-native';
+import { FlatList } from 'react-native';
 import { Stack } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import { IssueCard } from '@/components/issues/IssueCard';
+import { Header, PageLayout } from '@/components/layouts';
 import { IssueReport, IssueSeverity } from '@/types/models/Issue';
 
 // Mock data for issues
@@ -64,60 +64,38 @@ const MOCK_ISSUES: IssueReport[] = [
 
 export default function IssuesScreen() {
   const [issues, setIssues] = useState<IssueReport[]>(MOCK_ISSUES);
-  const insets = useSafeAreaInsets();
 
   const renderItem = ({ item }: { item: IssueReport }) => {
     return <IssueCard issue={item} />;
   };
 
   const renderEmptyComponent = () => (
-    <ThemedView style={styles.emptyContainer}>
-      <ThemedText type="title" style={styles.emptyTitle}>No Issues Found</ThemedText>
-      <ThemedText style={styles.emptyText}>
+    <ThemedView className="p-6 items-center justify-center h-[300px]">
+      <ThemedText type="title" className="mb-2 text-center">No Issues Found</ThemedText>
+      <ThemedText className="text-center opacity-70">
         There are no issues currently assigned to you. Create a new issue or check back later.
       </ThemedText>
     </ThemedView>
   );
 
   return (
-    <ThemedView style={[styles.container, { paddingTop: insets.top }]}>
+    <PageLayout
+      header={<Header title="Issues" />}
+    >
       <Stack.Screen options={{ 
-        title: 'Issues',
-        contentStyle: { paddingTop: 0 }
+        headerShown: false,
       }} />
       
       <FlatList
         data={issues}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
         ListEmptyComponent={renderEmptyComponent}
         showsVerticalScrollIndicator={false}
       />
-    </ThemedView>
+    </PageLayout>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  listContent: {
-    padding: 16,
-    paddingBottom: 32,
-  },
-  emptyContainer: {
-    padding: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 300,
-  },
-  emptyTitle: {
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  emptyText: {
-    textAlign: 'center',
-    opacity: 0.7,
-  }
-});
+

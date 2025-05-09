@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -15,20 +15,32 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
+        tabBarButton: props => <HapticTab {...props} />,
+        tabBarBackground: () => <TabBarBackground />,
         tabBarStyle: Platform.select({
           ios: {
             // Use a transparent background on iOS to show the blur effect
             position: 'absolute',
+            backgroundColor: 'transparent',
+            borderTopWidth: 0,
           },
-          default: {},
+          android: {
+            backgroundColor: colorScheme === 'dark' ? '#121212' : '#FFFFFF',
+            elevation: 8,
+          },
+          default: {
+            backgroundColor: colorScheme === 'dark' ? '#121212' : '#FFFFFF',
+          },
         }),
-        // Override default shadow styling with boxShadow
-        tabBarItemStyle: {
-          // This will replace any deprecated shadowColor, shadowOffset, etc.
-          boxShadow: '0px 2px 3px rgba(0,0,0,0.1)'
+        tabBarLabelStyle: {
+          fontFamily: 'Inter',
+          fontSize: 12,
+          paddingBottom: 4,
+        },
+        tabBarIconStyle: {
+          marginTop: 4,
         },
       }}>
       <Tabs.Screen
@@ -43,6 +55,13 @@ export default function TabLayout() {
         options={{
           title: 'Issues',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="exclamationmark.circle.fill" color={color} />
+        }}
+      />
+      <Tabs.Screen
+        name="reports"
+        options={{
+          title: 'Reports',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="doc.text.fill" color={color} />
         }}
       />
       <Tabs.Screen

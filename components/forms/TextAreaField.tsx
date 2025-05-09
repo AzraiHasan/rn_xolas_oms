@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { StyleSheet, TextInput } from 'react-native';
+import { TextInput } from 'react-native';
 
 import { FormField, FormFieldProps } from './FormField';
 
@@ -22,19 +22,14 @@ export const TextAreaField = forwardRef<TextInput, TextAreaFieldProps>(
         multiline
         numberOfLines={numberOfLines}
         textAlignVertical="top"
-        style={[styles.textArea, style]}
+        className="min-h-[100px] pt-3 md:min-h-[120px]"
+        style={style}
         {...rest}
       />
     );
   }
 );
 
-const styles = StyleSheet.create({
-  textArea: {
-    minHeight: 100,
-    paddingTop: 12,
-  },
-});
 
 // Display name for better debugging
 TextAreaField.displayName = 'TextAreaField';

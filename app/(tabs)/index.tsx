@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { Link } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
@@ -48,18 +48,18 @@ export default function HomeScreen() {
   const renderContent = () => {
     if (loading) {
       return (
-        <ThemedView style={styles.loadingContainer}>
+        <ThemedView className="items-center justify-center py-8">
           <ActivityIndicator size="large" color={colors.tint} />
-          <ThemedText style={styles.loadingText}>Loading dashboard...</ThemedText>
+          <ThemedText className="mt-3 text-gray-500">Loading dashboard...</ThemedText>
         </ThemedView>
       );
     }
     
     if (error) {
       return (
-        <ThemedView style={styles.errorContainer}>
+        <ThemedView className="items-center justify-center py-8 gap-3">
           <IconSymbol size={40} name="exclamationmark.circle.fill" color="#E11D48" />
-          <ThemedText style={styles.errorText}>{error}</ThemedText>
+          <ThemedText className="text-red-600 mb-2">{error}</ThemedText>
           <Button 
             label="Retry" 
             variant="primary" 
@@ -85,7 +85,7 @@ export default function HomeScreen() {
     return (
       <>
         {/* Issue Stats Cards */}
-        <ThemedView style={styles.statsContainer}>
+        <ThemedView className="flex-row flex-wrap gap-3 mb-6 md:gap-4">
           <StatisticCard
             value={stats.total}
             label="Total Issues"
@@ -129,16 +129,16 @@ export default function HomeScreen() {
         <IssueBarChart data={stats.bySeverity} total={stats.total} />
         
         {/* Quick Actions */}
-        <ThemedView style={styles.actionsContainer}>
+        <ThemedView className="mb-6">
           <ThemedText type="subtitle">Quick Actions</ThemedText>
           
-          <ThemedView style={styles.actionsRow}>
+          <ThemedView className="flex-row mt-3 gap-3 md:gap-4">
             <Link href="/(tabs)/create-issue" asChild>
               <Button
                 label="Report New Issue"
                 variant="primary"
                 leftIcon={<IconSymbol size={18} name="plus.circle.fill" color="#FFFFFF" />}
-                style={styles.actionButton}
+                className="flex-1"
               />
             </Link>
             
@@ -147,31 +147,31 @@ export default function HomeScreen() {
                 label="View All Issues"
                 variant="secondary"
                 leftIcon={<IconSymbol size={18} name="list.bullet" color={colors.tint} />}
-                style={styles.actionButton}
+                className="flex-1"
               />
             </Link>
           </ThemedView>
         </ThemedView>
         
         {/* Recent Activity */}
-        <ThemedView style={styles.recentActivityContainer}>
-          <ThemedView style={styles.sectionTitleRow}>
+        <ThemedView className="mb-6">
+          <ThemedView className="flex-row justify-between items-center mb-3">
             <ThemedText type="subtitle">Recent Activity</ThemedText>
-            <Link href="/(tabs)/issues">
-              <ThemedText style={styles.viewAllLink}>View all</ThemedText>
+            <Link href="/(tabs)/issues" className="flex-row items-center">
+              <ThemedText className="text-blue-600 text-sm">View all</ThemedText>
             </Link>
           </ThemedView>
           
           {stats.recentIssues.length > 0 ? (
-            <ThemedView style={styles.recentIssuesList}>
+            <ThemedView className="border border-[#E4E7EB] dark:border-gray-700 rounded-xl overflow-hidden">
               {stats.recentIssues.map((issue) => (
                 <RecentActivityItem key={issue.id} issue={issue} />
               ))}
             </ThemedView>
           ) : (
-            <ThemedView style={styles.emptyState}>
+            <ThemedView className="items-center justify-center py-8 border border-[#E4E7EB] dark:border-gray-700 rounded-xl mt-3">
               <IconSymbol size={40} name="tray.fill" color={colors.icon} />
-              <ThemedText style={styles.emptyStateText}>No recent activity</ThemedText>
+              <ThemedText className="mt-2 text-gray-500">No recent activity</ThemedText>
             </ThemedView>
           )}
         </ThemedView>
@@ -181,14 +181,15 @@ export default function HomeScreen() {
   
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+    className="md:pb-12"
+    headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
       headerImage={
         <Image
           source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+          className="h-[178px] w-[290px] absolute bottom-0 left-0"
         />
       }>
-      <ThemedView style={styles.titleContainer}>
+      <ThemedView className="flex-row items-center gap-2 mb-4">
         <ThemedText type="title">Issue Dashboard</ThemedText>
       </ThemedView>
       
@@ -197,6 +198,8 @@ export default function HomeScreen() {
   );
 }
 
+/* Legacy styles removed in favor of NativeWind classes */
+/*
 const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
@@ -280,3 +283,4 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
 });
+*/

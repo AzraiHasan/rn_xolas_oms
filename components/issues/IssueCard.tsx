@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { Link } from 'expo-router';
 import React from 'react';
-import { Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import { Pressable, StyleProp, ViewStyle } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -56,52 +56,54 @@ export function IssueCard({ issue, style, onPress }: IssueCardProps) {
   
   const cardContent = (
     <>
-      <ThemedView style={styles.header}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="defaultSemiBold" style={styles.title} numberOfLines={1}>
+      <ThemedView className="mb-0">
+        <ThemedView className="flex-row justify-between items-center mb-1">
+          <ThemedText 
+            type="defaultSemiBold" 
+            className="text-base flex-1 mr-2" 
+            numberOfLines={1}
+          >
             {issue.title}
           </ThemedText>
           
           <ThemedView
-            style={[
-              styles.severityBadge,
-              { backgroundColor: getSeverityColor() },
-            ]}
+            className="px-2 py-0.5 rounded-xl"
+            style={{ backgroundColor: getSeverityColor() }}
           >
-            <ThemedText style={styles.severityText}>{issue.severity}</ThemedText>
+            <ThemedText className="text-white text-xs font-medium">{issue.severity}</ThemedText>
           </ThemedView>
         </ThemedView>
         
-        <ThemedView style={styles.metaContainer}>
-          <ThemedView style={styles.metaItem}>
+        <ThemedView className="flex-row flex-wrap">
+          <ThemedView className="flex-row items-center mr-3 mb-1">
             <IconSymbol size={14} name="mappin.circle.fill" color={colors.icon} />
-            <ThemedText style={styles.metaText} numberOfLines={1}>
+            <ThemedText className="text-xs ml-1" numberOfLines={1}>
               {issue.location}
             </ThemedText>
           </ThemedView>
           
-          <ThemedView style={styles.metaItem}>
-            <IconSymbol size={14} name="calendar" color={colors.icon} />
-            <ThemedText style={styles.metaText}>{formattedDate}</ThemedText>
+          <ThemedView className="flex-row items-center mr-3 mb-1">
+            <IconSymbol size={14} name="event" color={colors.icon} />
+            <ThemedText className="text-xs ml-1">{formattedDate}</ThemedText>
           </ThemedView>
         </ThemedView>
       </ThemedView>
       
-      <ThemedText style={styles.description} numberOfLines={2}>
+      <ThemedText className="text-sm mb-3" numberOfLines={2}>
         {issue.description}
       </ThemedText>
       
       {issue.photos.length > 0 && (
-        <ThemedView style={styles.photosContainer}>
+        <ThemedView className="relative">
           <Image
             source={{ uri: issue.photos[0].uri }}
-            style={styles.thumbnailImage}
+            className="w-full h-[140px] md:h-[180px] rounded-lg"
             contentFit="cover"
           />
           
           {issue.photos.length > 1 && (
-            <ThemedView style={styles.photoCountBadge}>
-              <ThemedText style={styles.photoCountText}>+{issue.photos.length - 1}</ThemedText>
+            <ThemedView className="absolute bottom-2 right-2 bg-black/75 rounded-xl px-2 py-1">
+              <ThemedText className="text-white text-xs font-medium">+{issue.photos.length - 1}</ThemedText>
             </ThemedView>
           )}
         </ThemedView>
@@ -115,11 +117,8 @@ export function IssueCard({ issue, style, onPress }: IssueCardProps) {
       <Link href={{ pathname: '/issue/[id]', params: { id: issue.id } }} asChild>
         <Pressable>
           <ThemedView
-            style={[
-              styles.container,
-              { borderColor: colorScheme === 'dark' ? '#3E4144' : '#E4E7EB' },
-              style,
-            ]}
+          className="rounded-xl border p-4 md:p-5 mb-4"
+          style={[{ borderColor: colorScheme === 'dark' ? '#3E4144' : '#E4E7EB' }, style]}
           >
             {cardContent}
           </ThemedView>
@@ -132,11 +131,8 @@ export function IssueCard({ issue, style, onPress }: IssueCardProps) {
   return (
     <Pressable onPress={onPress}>
       <ThemedView
-        style={[
-          styles.container,
-          { borderColor: colorScheme === 'dark' ? '#3E4144' : '#E4E7EB' },
-          style,
-        ]}
+        className="rounded-xl border p-4 md:p-5 mb-4"
+        style={[{ borderColor: colorScheme === 'dark' ? '#3E4144' : '#E4E7EB' }, style]}
       >
         {cardContent}
       </ThemedView>
@@ -144,75 +140,4 @@ export function IssueCard({ issue, style, onPress }: IssueCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    borderRadius: 12,
-    borderWidth: 1,
-    padding: 16,
-    marginBottom: 16,
-  },
-  header: {
-    marginBottom: 0,
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  title: {
-    fontSize: 16,
-    flex: 1,
-    marginRight: 8,
-  },
-  severityBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12,
-  },
-  severityText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  metaContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 12,
-    marginBottom: 4,
-  },
-  metaText: {
-    fontSize: 12,
-    marginLeft: 4,
-  },
-  description: {
-    fontSize: 14,
-    marginBottom: 12,
-  },
-  photosContainer: {
-    position: 'relative',
-  },
-  thumbnailImage: {
-    width: '100%',
-    height: 140,
-    borderRadius: 8,
-  },
-  photoCountBadge: {
-    position: 'absolute',
-    bottom: 8,
-    right: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    borderRadius: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  photoCountText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '500',
-  },
-});
+// NativeWind classes replace StyleSheet

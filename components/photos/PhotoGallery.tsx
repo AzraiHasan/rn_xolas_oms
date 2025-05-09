@@ -5,7 +5,6 @@ import {
   FlatList, 
   Modal, 
   Pressable, 
-  StyleSheet, 
   TouchableOpacity
 } from 'react-native';
 
@@ -70,25 +69,25 @@ export function PhotoGallery({ photos, title = 'Photos' }: PhotoGalleryProps) {
   const renderPhotoGrid = () => {
     if (photos.length === 0) {
       return (
-        <ThemedView style={styles.emptyContainer}>
+        <ThemedView className="items-center justify-center p-8 border border-[#E4E7EB] dark:border-gray-700 border-dashed rounded-lg">
           <IconSymbol size={32} name="photo.fill" color={colors.icon} />
-          <ThemedText style={styles.emptyText}>No photos available</ThemedText>
+          <ThemedText className="mt-2 text-[#687076] dark:text-gray-400">No photos available</ThemedText>
         </ThemedView>
       );
     }
     
     return (
-      <ThemedView style={styles.gridContainer}>
+      <ThemedView className="flex-row flex-wrap -mx-1.5">
         {photos.map((photo, index) => (
           <TouchableOpacity 
             key={photo.id} 
-            style={styles.gridItem}
+            className="w-1/3 aspect-square p-1.5 md:w-1/4 lg:w-1/5"
             onPress={() => openPhotoViewer(index)}
             activeOpacity={0.7}
           >
             <Image
               source={{ uri: photo.uri }}
-              style={styles.gridImage}
+              className="flex-1 rounded-lg"
               contentFit="cover"
             />
           </TouchableOpacity>
@@ -110,27 +109,27 @@ export function PhotoGallery({ photos, title = 'Photos' }: PhotoGalleryProps) {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <ThemedView style={styles.modalContainer}>
-          <ThemedView style={styles.modalHeader}>
+        <ThemedView className="flex-1 bg-black/90">
+          <ThemedView className="flex-row justify-between items-center px-4 py-3">
             <TouchableOpacity
               onPress={() => setModalVisible(false)}
-              style={styles.closeButton}
+              className="w-11 h-11 items-center justify-center"
             >
               <IconSymbol name="xmark" size={24} color="#FFFFFF" />
             </TouchableOpacity>
             
-            <ThemedText style={styles.photoCounter}>
+            <ThemedText className="text-white text-base">
               {selectedPhotoIndex + 1} / {photos.length}
             </ThemedText>
           </ThemedView>
           
           <Pressable 
-            style={styles.imageContainer}
+            className="flex-1 justify-center"
             onPress={() => setModalVisible(false)}
           >
             <Image
               source={{ uri: selectedPhoto.uri }}
-              style={styles.fullImage}
+              className="w-full h-full"
               contentFit="contain"
             />
             
@@ -138,7 +137,7 @@ export function PhotoGallery({ photos, title = 'Photos' }: PhotoGalleryProps) {
             {photos.length > 1 && (
               <>
                 <TouchableOpacity
-                  style={[styles.navButton, styles.prevButton]}
+                  className="absolute w-15 h-15 rounded-full bg-black/30 items-center justify-center left-4"
                   onPress={(e) => {
                     e.stopPropagation();
                     navigateToPhoto('prev');
@@ -148,7 +147,7 @@ export function PhotoGallery({ photos, title = 'Photos' }: PhotoGalleryProps) {
                 </TouchableOpacity>
                 
                 <TouchableOpacity
-                  style={[styles.navButton, styles.nextButton]}
+                  className="absolute w-15 h-15 rounded-full bg-black/30 items-center justify-center right-4"
                   onPress={(e) => {
                     e.stopPropagation();
                     navigateToPhoto('next');
@@ -160,12 +159,12 @@ export function PhotoGallery({ photos, title = 'Photos' }: PhotoGalleryProps) {
             )}
           </Pressable>
           
-          <ThemedView style={styles.modalFooter}>
+          <ThemedView className="p-4">
             {selectedPhoto.title && (
-              <ThemedText style={styles.photoTitle}>{selectedPhoto.title}</ThemedText>
+              <ThemedText className="text-white text-base font-medium mb-1">{selectedPhoto.title}</ThemedText>
             )}
             
-            <ThemedText style={styles.photoDate}>
+            <ThemedText className="text-[#CCCCCC] text-sm">
               {formatTimestamp(selectedPhoto.timestamp)}
             </ThemedText>
           </ThemedView>
@@ -175,8 +174,8 @@ export function PhotoGallery({ photos, title = 'Photos' }: PhotoGalleryProps) {
   };
   
   return (
-    <ThemedView style={styles.container}>
-      {title && <ThemedText type="subtitle" style={styles.title}>{title} ({photos.length})</ThemedText>}
+    <ThemedView className="mb-6">
+      {title && <ThemedText type="subtitle" className="mb-4">{title} ({photos.length})</ThemedText>}
       
       {renderPhotoGrid()}
       {renderPhotoViewer()}
@@ -184,95 +183,4 @@ export function PhotoGallery({ photos, title = 'Photos' }: PhotoGalleryProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 24,
-  },
-  title: {
-    marginBottom: 16,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 32,
-    borderWidth: 1,
-    borderColor: '#E4E7EB',
-    borderRadius: 8,
-    borderStyle: 'dashed',
-  },
-  emptyText: {
-    marginTop: 8,
-    color: '#687076',
-  },
-  gridContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: -6,
-  },
-  gridItem: {
-    width: '33.333%',
-    aspectRatio: 1,
-    padding: 6,
-  },
-  gridImage: {
-    flex: 1,
-    borderRadius: 8,
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  closeButton: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  photoCounter: {
-    color: '#FFFFFF',
-    fontSize: 16,
-  },
-  imageContainer: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  fullImage: {
-    width: '100%',
-    height: '100%',
-  },
-  modalFooter: {
-    padding: 16,
-  },
-  photoTitle: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  photoDate: {
-    color: '#CCCCCC',
-    fontSize: 14,
-  },
-  navButton: {
-    position: 'absolute',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  prevButton: {
-    left: 16,
-  },
-  nextButton: {
-    right: 16,
-  },
-});
+// NativeWind classes replace StyleSheet

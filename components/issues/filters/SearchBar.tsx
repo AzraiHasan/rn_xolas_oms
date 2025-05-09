@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { TextInput, TouchableOpacity } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -55,18 +55,17 @@ export function SearchBar({
   const inputRef = useRef<TextInput>(null);
   
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView className="flex-row items-center pb-3">
       <ThemedView
-        style={[
-          styles.inputContainer,
-          { backgroundColor: colorScheme === 'dark' ? '#2A2A2A' : '#F5F5F5' },
-        ]}
+        className="flex-1 flex-row items-center rounded-lg px-3 h-10 md:h-12"
+        style={{ backgroundColor: colorScheme === 'dark' ? '#2A2A2A' : '#F5F5F5' }}
       >
-        <IconSymbol name="magnifyingglass" size={18} color={colors.icon} style={styles.searchIcon} />
+        <IconSymbol name="magnifyingglass" size={18} color={colors.icon} className="mr-2" />
         
         <TextInput
           ref={inputRef}
-          style={[styles.input, { color: colors.text }]}
+          className="flex-1 text-base py-2.5"
+          style={{ color: colors.text }}
           value={value}
           onChangeText={onChangeText}
           onSubmitEditing={onSubmit}
@@ -80,41 +79,11 @@ export function SearchBar({
         />
       </ThemedView>
       
-      <TouchableOpacity onPress={onCancel} style={styles.cancelButton}>
-        <ThemedText style={styles.cancelText}>Cancel</ThemedText>
+      <TouchableOpacity onPress={onCancel} className="ml-3">
+        <ThemedText className="text-[#0086C9] text-base">Cancel</ThemedText>
       </TouchableOpacity>
     </ThemedView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingBottom: 12,
-  },
-  inputContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    height: 40,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    paddingVertical: 8,
-  },
-  cancelButton: {
-    marginLeft: 12,
-    paddingVertical: 8,
-  },
-  cancelText: {
-    color: '#0086C9',
-    fontSize: 16,
-  },
-});
+

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Pressable, View } from 'react-native';
+import { Pressable } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IssueSeverity } from '@/types/models/Issue';
@@ -66,46 +66,46 @@ export const SeveritySelector = ({
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView className="mb-5">
       {label && (
-        <View style={styles.labelContainer}>
-          <ThemedText style={styles.label}>{label}</ThemedText>
-          {required && <ThemedText style={styles.requiredIndicator}> *</ThemedText>}
-        </View>
+        <ThemedView className="flex-row mb-1.5">
+          <ThemedText className="text-sm font-medium">{label}</ThemedText>
+          {required && <ThemedText className="text-[#E11D48] font-medium"> *</ThemedText>}
+        </ThemedView>
       )}
-      <ThemedView style={styles.severityContainer}>
+      <ThemedView className="flex-row justify-between space-x-2 md:space-x-3">
         <Pressable
-          style={[
-            styles.severityButton,
-            getSeverityButtonStyle(IssueSeverity.Low)
-          ]}
+          className="flex-1 py-3 md:py-4 rounded-lg items-center justify-center mx-1 border"
+          style={getSeverityButtonStyle(IssueSeverity.Low)}
           onPress={() => onChange(IssueSeverity.Low)}
         >
-          <ThemedText style={[styles.severityText, getSeverityTextStyle(IssueSeverity.Low)]}>
+          <ThemedText 
+            className="font-medium md:text-base"
+            style={getSeverityTextStyle(IssueSeverity.Low)}>
             Low
           </ThemedText>
         </Pressable>
         
         <Pressable
-          style={[
-            styles.severityButton,
-            getSeverityButtonStyle(IssueSeverity.Medium)
-          ]}
+          className="flex-1 py-3 md:py-4 rounded-lg items-center justify-center mx-1 border"
+          style={getSeverityButtonStyle(IssueSeverity.Medium)}
           onPress={() => onChange(IssueSeverity.Medium)}
         >
-          <ThemedText style={[styles.severityText, getSeverityTextStyle(IssueSeverity.Medium)]}>
+          <ThemedText 
+            className="font-medium md:text-base"
+            style={getSeverityTextStyle(IssueSeverity.Medium)}>
             Medium
           </ThemedText>
         </Pressable>
         
         <Pressable
-          style={[
-            styles.severityButton,
-            getSeverityButtonStyle(IssueSeverity.High)
-          ]}
+          className="flex-1 py-3 md:py-4 rounded-lg items-center justify-center mx-1 border"
+          style={getSeverityButtonStyle(IssueSeverity.High)}
           onPress={() => onChange(IssueSeverity.High)}
         >
-          <ThemedText style={[styles.severityText, getSeverityTextStyle(IssueSeverity.High)]}>
+          <ThemedText 
+            className="font-medium md:text-base"
+            style={getSeverityTextStyle(IssueSeverity.High)}>
             High
           </ThemedText>
         </Pressable>
@@ -114,36 +114,4 @@ export const SeveritySelector = ({
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 20,
-  },
-  labelContainer: {
-    flexDirection: 'row',
-    marginBottom: 6,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  requiredIndicator: {
-    color: '#E11D48',
-    fontWeight: '500',
-  },
-  severityContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  severityButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: 4,
-    borderWidth: 1,
-  },
-  severityText: {
-    fontWeight: '500',
-  },
-});
+// NativeWind classes replace StyleSheet

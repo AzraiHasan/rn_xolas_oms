@@ -1,15 +1,13 @@
 import React, { forwardRef, useState } from 'react';
 import {
-  StyleProp,
-  StyleSheet,
   TextInput,
   TextInputProps,
   View,
+  StyleProp,
   ViewStyle,
 } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -55,6 +53,11 @@ export interface InputProps extends TextInputProps {
    * Optional left icon
    */
   leftIcon?: React.ReactNode;
+  
+  /**
+   * Additional className for styling with NativeWind
+   */
+  className?: string;
 }
 
 /**
@@ -75,6 +78,7 @@ export const Input = forwardRef<TextInput, InputProps>(
       placeholder,
       onFocus,
       onBlur,
+      className,
       ...rest
     },
     ref
@@ -100,29 +104,28 @@ export const Input = forwardRef<TextInput, InputProps>(
     };
 
     return (
-      <View style={[styles.container, containerStyle]}>
+      <View className="mb-4" style={containerStyle}>
         {label && (
-          <View style={styles.labelContainer}>
-            <ThemedText style={styles.label}>{label}</ThemedText>
-            {required && <ThemedText style={styles.requiredIndicator}> *</ThemedText>}
+          <View className="flex-row mb-1.5">
+            <ThemedText className="text-sm font-medium">{label}</ThemedText>
+            {required && <ThemedText className="text-[#E11D48] font-medium"> *</ThemedText>}
           </View>
         )}
         <View
-          style={[
-            styles.inputContainer,
-            {
-              borderColor: getBorderColor(),
-              backgroundColor: colorScheme === 'dark' ? '#1E1F20' : '#F9FAFB',
-            },
-          ]}
+          className={`flex-row items-center border rounded-lg min-h-[44px] px-3 ${
+            colorScheme === 'dark' ? 'bg-[#1E1F20]' : 'bg-[#F9FAFB]'
+          } ${className || ''}`}
+          style={{
+            borderColor: getBorderColor(),
+          }}
         >
-          {leftIcon && <View style={styles.leftIconContainer}>{leftIcon}</View>}
+          {leftIcon && <View className="mr-2.5">{leftIcon}</View>}
           <TextInput
             ref={ref}
             placeholderTextColor={colorScheme === 'dark' ? '#9BA1A6' : '#687076'}
             placeholder={placeholder}
+            className="flex-1 text-base py-2.5"
             style={[
-              styles.input,
               {
                 color: colors.text,
               },
@@ -132,14 +135,11 @@ export const Input = forwardRef<TextInput, InputProps>(
             onBlur={handleBlur}
             {...rest}
           />
-          {rightIcon && <View style={styles.rightIconContainer}>{rightIcon}</View>}
+          {rightIcon && <View className="ml-2.5">{rightIcon}</View>}
         </View>
         {(error || helperText) && (
           <ThemedText
-            style={[
-              styles.helperText,
-              isError && { color: '#E11D48' },
-            ]}
+            className={`text-xs mt-1 ${isError ? 'text-[#E11D48]' : ''}`}
           >
             {error || helperText}
           </ThemedText>
@@ -148,47 +148,6 @@ export const Input = forwardRef<TextInput, InputProps>(
     );
   }
 );
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-  },
-  labelContainer: {
-    flexDirection: 'row',
-    marginBottom: 6,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  requiredIndicator: {
-    color: '#E11D48',
-    fontWeight: '500',
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: 8,
-    minHeight: 44,
-    paddingHorizontal: 12,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    paddingVertical: 10,
-  },
-  leftIconContainer: {
-    marginRight: 10,
-  },
-  rightIconContainer: {
-    marginLeft: 10,
-  },
-  helperText: {
-    fontSize: 12,
-    marginTop: 4,
-  },
-});
 
 // Display name for better debugging
 Input.displayName = 'Input';

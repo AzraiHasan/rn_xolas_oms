@@ -4,7 +4,6 @@ import {
   Pressable,
   PressableProps,
   StyleProp,
-  StyleSheet,
   TextStyle,
   View,
   ViewStyle,
@@ -60,6 +59,11 @@ export interface ButtonProps extends Omit<PressableProps, 'style'> {
    * Custom text style
    */
   textStyle?: StyleProp<TextStyle>;
+  
+  /**
+   * Additional className for styling with NativeWind
+   */
+  className?: string;
 }
 
 /**
@@ -75,84 +79,100 @@ export function Button({
   style,
   textStyle,
   disabled,
+  className,
   ...rest
 }: ButtonProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   
-  const getContainerStyle = () => {
-    const baseStyle: ViewStyle = {
-      ...styles.container,
-      ...sizeStyles[size],
-    };
+  const getContainerClasses = () => {
+    // Base classes for all buttons
+    let classes = 'items-center justify-center';
     
-    // Apply variant-specific styles
+    // Size classes
+    switch (size) {
+      case 'small':
+        classes += ' py-1.5 px-3 rounded-md';
+        break;
+      case 'medium':
+        classes += ' py-2.5 px-4 rounded-lg';
+        break;
+      case 'large':
+        classes += ' py-3.5 px-5 rounded-xl';
+        break;
+      default:
+        classes += ' py-2.5 px-4 rounded-lg';
+    }
+    
+    // Variant classes
     switch (variant) {
       case 'primary':
-        return {
-          ...baseStyle,
-          backgroundColor: colors.tint,
-        };
+        classes += ` bg-[${colors.tint}]`;
+        break;
       case 'secondary':
-        return {
-          ...baseStyle,
-          backgroundColor: 'transparent',
-          borderWidth: 2,
-          borderColor: colors.tint,
-        };
+        classes += ` bg-transparent border-2 border-[${colors.tint}]`;
+        break;
       case 'danger':
-        return {
-          ...baseStyle,
-          backgroundColor: '#E11D48',
-        };
+        classes += ' bg-[#E11D48]';
+        break;
       case 'ghost':
-        return {
-          ...baseStyle,
-          backgroundColor: 'transparent',
-        };
+        classes += ' bg-transparent';
+        break;
       default:
-        return baseStyle;
+        classes += ` bg-[${colors.tint}]`;
     }
+    
+    // Add custom classes
+    if (className) {
+      classes += ` ${className}`;
+    }
+    
+    return classes;
   };
   
-  const getTextStyle = () => {
-    const baseStyle: TextStyle = {
-      ...textSizeStyles[size],
-    };
+  const getTextClasses = () => {
+    // Base text classes
+    let classes = 'font-medium';
     
-    // Apply variant-specific text styles
+    // Size-specific text classes
+    switch (size) {
+      case 'small':
+        classes += ' text-sm';
+        break;
+      case 'medium':
+        classes += ' text-base';
+        break;
+      case 'large':
+        classes += ' text-lg';
+        break;
+      default:
+        classes += ' text-base';
+    }
+    
+    return classes;
+  };
+  
+  const getTextColor = () => {
     switch (variant) {
       case 'primary':
-        return {
-          ...baseStyle,
-          color: '#FFFFFF',
-        };
+        return '#FFFFFF';
       case 'secondary':
-        return {
-          ...baseStyle,
-          color: colors.tint,
-        };
+        return colors.tint;
       case 'danger':
-        return {
-          ...baseStyle,
-          color: '#FFFFFF',
-        };
+        return '#FFFFFF';
       case 'ghost':
-        return {
-          ...baseStyle,
-          color: colors.text,
-        };
+        return colors.text;
       default:
-        return baseStyle;
+        return '#FFFFFF';
     }
   };
   
   return (
     <Pressable
+      className={getContainerClasses()}
       style={({ pressed }) => [
-        getContainerStyle(),
-        pressed && styles.pressed,
-        disabled && styles.disabled,
+        pressed && { opacity: 0.7 },
+        disabled && { opacity: 0.5 },
         style,
       ]}
       disabled={disabled || loading}
@@ -164,68 +184,14 @@ export function Button({
           color={variant === 'secondary' || variant === 'ghost' ? colors.tint : '#FFFFFF'}
         />
       ) : (
-        <View style={styles.contentContainer}>
-          {leftIcon && <View style={styles.iconContainer}>{leftIcon}</View>}
-          <ThemedText style={[getTextStyle(), textStyle]}>{label}</ThemedText>
-          {rightIcon && <View style={styles.iconContainer}>{rightIcon}</View>}
+        <View className="flex-row items-center justify-center">
+          {leftIcon && <View className="mx-1.5">{leftIcon}</View>}
+          <ThemedText style={[{ color: getTextColor() }, textStyle]} className={getTextClasses()}>
+            {label}
+          </ThemedText>
+          {rightIcon && <View className="mx-1.5">{rightIcon}</View>}
         </View>
       )}
     </Pressable>
   );
 }
-
-// Size variants
-const sizeStyles: Record<ButtonSize, ViewStyle> = {
-  small: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-  },
-  medium: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  large: {
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-};
-
-// Text size variants
-const textSizeStyles: Record<ButtonSize, TextStyle> = {
-  small: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  medium: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  large: {
-    fontSize: 18,
-    fontWeight: '500',
-  },
-};
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  contentContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconContainer: {
-    marginHorizontal: 6,
-  },
-  pressed: {
-    opacity: 0.7,
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-});

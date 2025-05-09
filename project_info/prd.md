@@ -1,8 +1,8 @@
-## Product Requirements Document: Onsite Reporting App Prototype (React Native/Expo)
+## Product Requirements Document: Onsite Reporting App Prototype (React Native/Expo + NativeWind UI)
 
 **1. Introduction**
 
-This document outlines the requirements for a prototype of an Onsite Reporting App. The app aims to provide onsite technicians with a simple and efficient tool to report issues, capture photographic evidence, and document site conditions directly from their mobile devices. This prototype will be developed using **React Native with the Expo framework**, targeting cross-platform compatibility (iOS and Android). A **React Native Reusable UI library** will be utilized to accelerate development and ensure a consistent user interface. The primary goal of this prototype is to validate core functionality and gather user feedback for future development.
+This document outlines the requirements for a prototype of an Onsite Reporting App. The app aims to provide onsite technicians with a simple and efficient tool to report issues, capture photographic evidence, and document site conditions directly from their mobile devices. This prototype will be developed using **React Native with the Expo framework**, targeting **Android-platform compatibility**. A **NativeWind UI library** will be utilized to accelerate development and ensure a consistent user interface. The primary goal of this prototype is to validate core functionality and gather user feedback for future development.
 
 ```mermaid
 flowchart TD
