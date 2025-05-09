@@ -1,8 +1,8 @@
+import Constants from 'expo-constants';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
-import Constants from 'expo-constants';
-import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PhotoGallery } from '@/components/photos';
@@ -97,26 +97,11 @@ export default function IssueDetailScreen() {
     }
   };
   
-  // Render the back button
-  const renderBackButton = () => (
-    <ThemedView style={styles.header}>
-      <Link href="/(tabs)/issues" asChild>
-        <Button
-          label="Back to Issues"
-          variant="ghost"
-          leftIcon={<IconSymbol size={18} name="chevron.left" color={colors.text} />}
-          textStyle={{ color: colors.text }}
-        />
-      </Link>
-    </ThemedView>
-  );
-  
   // Render content based on state
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar style="light" />
-        {renderBackButton()}
         <ThemedView style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.tint} />
           <ThemedText style={styles.loadingText}>Loading issue details...</ThemedText>
@@ -129,7 +114,6 @@ export default function IssueDetailScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar style="light" />
-        {renderBackButton()}
         <ThemedView style={styles.errorContainer}>
           <IconSymbol 
             size={48} 
@@ -148,7 +132,6 @@ export default function IssueDetailScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
-      {renderBackButton()}
       
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Issue Header */}
@@ -234,17 +217,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: Constants.statusBarHeight,
   },
-  header: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     padding: 16,
-    paddingTop: 0,
   },
   issueHeader: {
     flexDirection: 'row',
