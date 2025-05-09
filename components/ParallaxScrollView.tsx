@@ -1,11 +1,12 @@
 import type { PropsWithChildren, ReactElement } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedRef,
   useAnimatedStyle,
   useScrollViewOffset,
 } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedView } from '@/components/ThemedView';
 import { useBottomTabOverflow } from '@/components/ui/TabBarBackground';
@@ -27,18 +28,23 @@ export default function ParallaxScrollView({
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollViewOffset(scrollRef);
   const bottom = useBottomTabOverflow();
+  const insets = useSafeAreaInsets();
+  
+  // Calculate header height with safe area insets
+  const headerHeight = HEADER_HEIGHT + insets.top;
+  
   const headerAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
         {
           translateY: interpolate(
             scrollOffset.value,
-            [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
-            [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75]
+            [-headerHeight, 0, headerHeight],
+            [-headerHeight / 2, 0, headerHeight * 0.75]
           ),
         },
         {
-          scale: interpolate(scrollOffset.value, [-HEADER_HEIGHT, 0, HEADER_HEIGHT], [2, 1, 1]),
+          scale: interpolate(scrollOffset.value, [-headerHeight, 0, headerHeight], [2, 1, 1]),
         },
       ],
     };
@@ -46,15 +52,31 @@ export default function ParallaxScrollView({
 
   return (
     <ThemedView style={styles.container}>
+      <ThemedView 
+        style={[
+          styles.statusBarPlaceholder, 
+          { height: insets.top, backgroundColor: headerBackgroundColor[colorScheme] }
+        ]} 
+      />
       <Animated.ScrollView
         ref={scrollRef}
         scrollEventThrottle={16}
-        scrollIndicatorInsets={{ bottom }}
-        contentContainerStyle={{ paddingBottom: bottom }}>
+        contentInsetAdjustmentBehavior="automatic"
+        scrollIndicatorInsets={{ bottom, top: insets.top }}
+        automaticallyAdjustContentInsets={true}
+        contentContainerStyle={{ 
+          paddingBottom: bottom, 
+          paddingTop: headerHeight,
+        }}>
         <Animated.View
           style={[
             styles.header,
-            { backgroundColor: headerBackgroundColor[colorScheme] },
+            { 
+              backgroundColor: headerBackgroundColor[colorScheme],
+              height: headerHeight,
+              top: -insets.top,
+              paddingTop: insets.top
+            },
             headerAnimatedStyle,
           ]}>
           {headerImage}
@@ -69,9 +91,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  statusBarPlaceholder: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100,
+  },
   header: {
-    height: HEADER_HEIGHT,
     overflow: 'hidden',
+    position: 'absolute',
+    left: 0,
+    right: 0,
   },
   content: {
     flex: 1,

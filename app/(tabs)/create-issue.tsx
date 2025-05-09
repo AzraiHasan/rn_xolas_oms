@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
-import { StyleSheet, ScrollView, TextInput, Pressable, Alert } from 'react-native';
+import React from 'react';
+import { StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
+import { FormField, TextAreaField, SeveritySelector } from '@/components/forms';
+import { PhotoPicker } from '@/components/photos';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { IssueReportInput, IssueSeverity } from '@/types/models/Issue';
+import { useForm } from '@/hooks/forms/useForm';
+import { IssueReportInput, IssueSeverity, Photo } from '@/types/models/Issue';
+import { requiredValidator, minLengthValidator } from '@/utils/validation';
 
 export default function CreateIssueScreen() {
   const colorScheme = useColorScheme();
@@ -15,74 +19,70 @@ export default function CreateIssueScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   
-  const [formData, setFormData] = useState<Partial<IssueReportInput>>({
-    title: '',
-    description: '',
-    location: '',
-    severity: IssueSeverity.Medium,
-    photos: [],
-    timestamp: new Date().toISOString()
+  const {
+    values,
+    errors,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    validateForm
+  } = useForm<Partial<IssueReportInput>>({
+    initialValues: {
+      title: '',
+      description: '',
+      location: '',
+      severity: IssueSeverity.Medium,
+      photos: [],
+      timestamp: new Date().toISOString()
+    },
+    validators: {
+      title: [
+        requiredValidator,
+        minLengthValidator(3)
+      ],
+      description: [
+        requiredValidator,
+        minLengthValidator(10)
+      ],
+      location: [
+        requiredValidator
+      ]
+    },
+    onSubmit: (formValues) => {
+      // Here would be the call to save the new issue
+      Alert.alert(
+        'Success',
+        'New issue created successfully',
+        [
+          {
+            text: 'OK',
+            onPress: () => router.navigate('/(tabs)/')
+          }
+        ]
+      );
+    }
   });
 
-  const handleChange = (field: keyof IssueReportInput, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  // Handle photo changes
+  const handlePhotosChange = (newPhotos: Photo[]) => {
+    handleChange('photos', newPhotos);
   };
 
-  const handleSeverityChange = (severity: IssueSeverity) => {
-    handleChange('severity', severity);
-  };
-
-  const handleSubmit = () => {
-    // Check if required fields are filled
-    if (!formData.title || !formData.description || !formData.location) {
-      Alert.alert('Required Fields', 'Please fill all required fields');
-      return;
-    }
-
-    // Here would be the call to save the new issue
-    // For now just show a success message and navigate back
-    Alert.alert(
-      'Success',
-      'New issue created successfully',
-      [
-        {
-          text: 'OK',
-          onPress: () => router.navigate('/(tabs)/')
-        }
-      ]
-    );
-  };
-
-  // Helper to determine button style based on selection state
-  const getSeverityButtonStyle = (severity: IssueSeverity) => {
-    const isSelected = formData.severity === severity;
+  // Handle manual form submission with additional UI feedback
+  const handleFormSubmit = () => {
+    // Run form validation
+    const isFormValid = validateForm();
     
-    let backgroundColor;
-    if (isSelected) {
-      switch (severity) {
-        case IssueSeverity.High:
-          return { backgroundColor: '#E11D48', borderColor: '#E11D48' };
-        case IssueSeverity.Medium:
-          return { backgroundColor: '#F59E0B', borderColor: '#F59E0B' };
-        case IssueSeverity.Low:
-          return { backgroundColor: '#10B981', borderColor: '#10B981' };
-      }
+    if (isFormValid) {
+      handleSubmit();
+    } else {
+      // Show error alert if validation fails
+      Alert.alert(
+        'Validation Error',
+        'Please fill all required fields correctly.',
+        [{ text: 'OK' }]
+      );
     }
-    
-    return {
-      backgroundColor: 'transparent',
-      borderColor: colorScheme === 'dark' ? '#3E4144' : '#E4E7EB'
-    };
-  };
-
-  const getSeverityTextStyle = (severity: IssueSeverity) => {
-    const isSelected = formData.severity === severity;
-    return {
-      color: isSelected ? '#FFFFFF' : colors.text
-    };
   };
 
   return (
@@ -97,120 +97,66 @@ export default function CreateIssueScreen() {
         contentContainerStyle={styles.formContent}
         showsVerticalScrollIndicator={false}
       >
-        <ThemedView style={styles.inputGroup}>
-          <ThemedText style={styles.label}>Title *</ThemedText>
-          <TextInput
-            style={[
-              styles.input,
-              { 
-                color: colors.text,
-                borderColor: colorScheme === 'dark' ? '#3E4144' : '#E4E7EB',
-                backgroundColor: colorScheme === 'dark' ? '#1C1C1E' : '#F9FAFB'
-              }
-            ]}
-            placeholder="Enter issue title"
-            placeholderTextColor={colorScheme === 'dark' ? '#6B7280' : '#9CA3AF'}
-            value={formData.title}
-            onChangeText={(text) => handleChange('title', text)}
-          />
-        </ThemedView>
+        <FormField
+          name="title"
+          label="Title"
+          required
+          placeholder="Enter issue title"
+          value={values.title || ''}
+          onChangeValue={handleChange}
+          onBlur={() => handleBlur('title')}
+          error={errors.title}
+          isError={!!errors.title}
+          validationRules={[requiredValidator, minLengthValidator(3)]}
+        />
 
-        <ThemedView style={styles.inputGroup}>
-          <ThemedText style={styles.label}>Description *</ThemedText>
-          <TextInput
-            style={[
-              styles.input,
-              styles.textArea,
-              { 
-                color: colors.text,
-                borderColor: colorScheme === 'dark' ? '#3E4144' : '#E4E7EB',
-                backgroundColor: colorScheme === 'dark' ? '#1C1C1E' : '#F9FAFB'
-              }
-            ]}
-            placeholder="Describe the issue in detail"
-            placeholderTextColor={colorScheme === 'dark' ? '#6B7280' : '#9CA3AF'}
-            value={formData.description}
-            onChangeText={(text) => handleChange('description', text)}
-            multiline
-            numberOfLines={4}
-            textAlignVertical="top"
-          />
-        </ThemedView>
+        <TextAreaField
+          name="description"
+          label="Description"
+          required
+          placeholder="Describe the issue in detail"
+          value={values.description || ''}
+          onChangeValue={handleChange}
+          onBlur={() => handleBlur('description')}
+          error={errors.description}
+          isError={!!errors.description}
+          validationRules={[requiredValidator, minLengthValidator(10)]}
+          numberOfLines={4}
+        />
 
-        <ThemedView style={styles.inputGroup}>
-          <ThemedText style={styles.label}>Location *</ThemedText>
-          <TextInput
-            style={[
-              styles.input,
-              { 
-                color: colors.text,
-                borderColor: colorScheme === 'dark' ? '#3E4144' : '#E4E7EB',
-                backgroundColor: colorScheme === 'dark' ? '#1C1C1E' : '#F9FAFB'
-              }
-            ]}
-            placeholder="Enter issue location"
-            placeholderTextColor={colorScheme === 'dark' ? '#6B7280' : '#9CA3AF'}
-            value={formData.location}
-            onChangeText={(text) => handleChange('location', text)}
-          />
-        </ThemedView>
+        <FormField
+          name="location"
+          label="Location"
+          required
+          placeholder="Enter issue location"
+          value={values.location || ''}
+          onChangeValue={handleChange}
+          onBlur={() => handleBlur('location')}
+          error={errors.location}
+          isError={!!errors.location}
+          validationRules={[requiredValidator]}
+        />
 
-        <ThemedView style={styles.inputGroup}>
-          <ThemedText style={styles.label}>Severity *</ThemedText>
-          <ThemedView style={styles.severityContainer}>
-            <Pressable
-              style={[
-                styles.severityButton,
-                getSeverityButtonStyle(IssueSeverity.Low)
-              ]}
-              onPress={() => handleSeverityChange(IssueSeverity.Low)}
-            >
-              <ThemedText style={[styles.severityText, getSeverityTextStyle(IssueSeverity.Low)]}>
-                Low
-              </ThemedText>
-            </Pressable>
-            
-            <Pressable
-              style={[
-                styles.severityButton,
-                getSeverityButtonStyle(IssueSeverity.Medium)
-              ]}
-              onPress={() => handleSeverityChange(IssueSeverity.Medium)}
-            >
-              <ThemedText style={[styles.severityText, getSeverityTextStyle(IssueSeverity.Medium)]}>
-                Medium
-              </ThemedText>
-            </Pressable>
-            
-            <Pressable
-              style={[
-                styles.severityButton,
-                getSeverityButtonStyle(IssueSeverity.High)
-              ]}
-              onPress={() => handleSeverityChange(IssueSeverity.High)}
-            >
-              <ThemedText style={[styles.severityText, getSeverityTextStyle(IssueSeverity.High)]}>
-                High
-              </ThemedText>
-            </Pressable>
-          </ThemedView>
-        </ThemedView>
+        <SeveritySelector
+          label="Severity"
+          required
+          value={values.severity || IssueSeverity.Medium}
+          onChange={(severity) => handleChange('severity', severity)}
+        />
 
-        <ThemedView style={styles.inputGroup}>
-          <ThemedText style={styles.label}>Photos</ThemedText>
-          <ThemedView style={styles.photoPlaceholder}>
-            <ThemedText style={styles.photoPlaceholderText}>
-              Tap to add photos
-            </ThemedText>
-          </ThemedView>
-        </ThemedView>
+        <PhotoPicker
+          label="Photos"
+          photos={values.photos || []}
+          onPhotosChange={handlePhotosChange}
+          maxPhotos={5}
+        />
 
         <Pressable
           style={[
             styles.submitButton,
             { backgroundColor: colors.primary }
           ]}
-          onPress={handleSubmit}
+          onPress={handleFormSubmit}
         >
           <ThemedText style={styles.submitButtonText}>Create Issue</ThemedText>
         </Pressable>
@@ -229,52 +175,6 @@ const styles = StyleSheet.create({
   formContent: {
     padding: 16,
     paddingBottom: 40,
-  },
-  inputGroup: {
-    marginBottom: 20,
-  },
-  label: {
-    marginBottom: 8,
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-  },
-  textArea: {
-    height: 120,
-    paddingTop: 12,
-  },
-  severityContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  severityButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: 4,
-    borderWidth: 1,
-  },
-  severityText: {
-    fontWeight: '500',
-  },
-  photoPlaceholder: {
-    height: 120,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    borderColor: '#9CA3AF',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  photoPlaceholderText: {
-    opacity: 0.5,
   },
   submitButton: {
     padding: 16,
