@@ -166,7 +166,7 @@ export function IssueDetailScreen({ issueId }: IssueDetailScreenProps) {
           </ThemedView>
           
           <ThemedView style={styles.metaItem}>
-            <IconSymbol size={16} name="calendar" color={colors.icon} />
+            <IconSymbol size={16} name="calendar.circle" color={colors.icon} />
             <ThemedText style={styles.metaText}>{formatTimestamp(issue.timestamp)}</ThemedText>
           </ThemedView>
           

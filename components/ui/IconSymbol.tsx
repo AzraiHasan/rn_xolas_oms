@@ -1,24 +1,33 @@
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SymbolWeight, SymbolViewProps } from 'expo-symbols';
 import { ComponentProps } from 'react';
 import { OpaqueColorValue, StyleProp, TextStyle, Platform, Text } from 'react-native';
 
-// Define Material Icons mapping
+// Define Material Community Icons mapping
 const MATERIAL_ICON_MAPPING: Record<string, string> = {
-  // SF Symbol to Material Icon mapping
+  // SF Symbol to Material Community Icon mapping
   'house.fill': 'home',
   'paperplane.fill': 'send',
-  'chevron.left.forwardslash.chevron.right': 'code',
+  'chevron.left.forwardslash.chevron.right': 'code-tags',
   'chevron.right': 'chevron-right',
-  'exclamationmark.circle.fill': 'error',
-  'doc.text.fill': 'description',
-  'plus.circle.fill': 'add',  // Using simpler icon names
-  'exclamationmark.triangle.fill': 'warning',
-  'checkmark.circle.fill': 'check',
-  'list.bullet': 'list',
+  'chevron.left': 'chevron-left',
+  'exclamationmark.circle.fill': 'alert-circle',
+  'doc.text.fill': 'file-document',
+  'plus.circle.fill': 'plus-circle',  
+  'plus': 'plus',
+  'exclamationmark.triangle.fill': 'alert',
+  'checkmark.circle.fill': 'check-circle',
+  'list.bullet': 'format-list-bulleted',
   'tray.fill': 'inbox',
-  'mappin.circle.fill': 'place',
-  'info.circle.fill': 'info',
+  'mappin.circle.fill': 'map-marker',
+  'info.circle.fill': 'information',
+  'calendar': 'calendar',
+  'calendar.circle': 'calendar',
+  'xmark': 'close',
+  'photo.fill': 'image',
+  'pencil': 'pencil',
+  'trash.fill': 'delete',
+  'square.and.arrow.up': 'share',
 };
 
 // Get safe icon name for Material Icons
@@ -60,7 +69,7 @@ export function IconSymbol({
   };
   
   return (
-    <MaterialIcons 
+    <MaterialCommunityIcons 
       name={iconName} 
       size={size} 
       color={color} 

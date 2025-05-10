@@ -1,11 +1,14 @@
 import { Image } from 'expo-image';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { 
   Dimensions, 
   FlatList, 
   Modal, 
   Pressable, 
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator,
+  View,
+  StyleSheet
 } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -42,7 +45,7 @@ export function PhotoGallery({ photos, title = 'Photos', onPhotoRemove }: PhotoG
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
   
-  const { width: screenWidth } = Dimensions.get('window');
+  const { width, height } = Dimensions.get('window');
   
   // Format timestamp to a readable date
   const formatTimestamp = (timestamp: string): string => {
@@ -71,46 +74,81 @@ export function PhotoGallery({ photos, title = 'Photos', onPhotoRemove }: PhotoG
   };
   
   // Handle photo removal
-  const handleRemovePhoto = (photoId: string) => {
+  const handleRemovePhoto = useCallback((photoId: string) => {
     if (onPhotoRemove) {
       onPhotoRemove(photoId);
     }
-  };
+  }, [onPhotoRemove]);
   
-  // Render the photo grid
-  const renderPhotoGrid = () => {
-    if (photos.length === 0) {
-      return (
-        <ThemedView className="items-center justify-center p-8 border border-[#E4E7EB] dark:border-gray-700 border-dashed rounded-lg">
-          <IconSymbol size={32} name="photo.fill" color={colors.icon} />
-          <ThemedText className="mt-2 text-[#687076] dark:text-gray-400">No photos available</ThemedText>
-        </ThemedView>
-      );
-    }
+  // PhotoItem component to fix hooks error
+  const PhotoItem = React.memo(({ photo, index, onPress, onRemove }: {
+    photo: Photo;
+    index: number;
+    onPress: (index: number) => void;
+    onRemove?: (id: string) => void;
+  }) => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(false);
     
     return (
-      <ThemedView className="flex-row flex-wrap -mx-1.5">
-        {photos.map((photo, index) => (
-          <TouchableOpacity 
-            key={photo.id} 
-            className="w-1/3 aspect-square p-1.5 md:w-1/4 lg:w-1/5"
-            onPress={() => openPhotoViewer(index)}
-            activeOpacity={0.7}
-          >
+      <TouchableOpacity 
+        className="w-1/3 aspect-square p-1.5 md:w-1/4 lg:w-1/5"
+        onPress={() => onPress(index)}
+        activeOpacity={0.7}
+      >
+        <View style={styles.imageContainer}>
+          {isLoading && (
+            <View style={styles.loaderContainer}>
+              <ActivityIndicator size="small" color={colors.tint} />
+            </View>
+          )}
+          
+          {error ? (
+            <View style={[styles.errorContainer, { backgroundColor: colors.card }]}>
+              <IconSymbol name="exclamationmark.triangle" size={20} color={colors.error || '#E11D48'} />
+              <ThemedText style={styles.errorText}>Failed to load</ThemedText>
+            </View>
+          ) : (
             <Image
               source={{ uri: photo.uri }}
               className="flex-1 rounded-lg"
               contentFit="cover"
+              style={styles.image}
+              onLoadStart={() => setIsLoading(true)}
+              onLoad={() => setIsLoading(false)}
+              onError={() => {
+                setIsLoading(false);
+                setError(true);
+                console.error(`Failed to load image: ${photo.uri}`);
+              }}
             />
-            {onPhotoRemove && (
-              <TouchableOpacity
-                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 items-center justify-center"
-                onPress={() => handleRemovePhoto(photo.id)}
-              >
-                <IconSymbol name="xmark" size={16} color="#FFFFFF" />
-              </TouchableOpacity>
-            )}
-          </TouchableOpacity>
+          )}
+          
+          {onRemove && (
+            <TouchableOpacity
+              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 items-center justify-center"
+              onPress={() => onRemove(photo.id)}
+            >
+              <IconSymbol name="xmark" size={16} color="#FFFFFF" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  });
+  
+  // Simple grid layout to avoid FlatList nesting issues
+  const renderSimpleGrid = () => {
+    return (
+      <ThemedView className="flex-row flex-wrap">
+        {photos.map((photo, index) => (
+          <PhotoItem
+            key={photo.id}
+            photo={photo}
+            index={index}
+            onPress={openPhotoViewer}
+            onRemove={onPhotoRemove}
+          />
         ))}
       </ThemedView>
     );
@@ -129,78 +167,193 @@ export function PhotoGallery({ photos, title = 'Photos', onPhotoRemove }: PhotoG
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <ThemedView className="flex-1 bg-black/90">
-          <ThemedView className="flex-row justify-between items-center px-4 py-3">
+        <View style={styles.modalContainer}>
+          {/* Header */}
+          <View style={styles.modalHeader}>
             <TouchableOpacity
               onPress={() => setModalVisible(false)}
-              className="w-11 h-11 items-center justify-center"
+              style={styles.closeButton}
             >
               <IconSymbol name="xmark" size={24} color="#FFFFFF" />
             </TouchableOpacity>
             
-            <ThemedText className="text-white text-base">
+            <ThemedText style={styles.photoCounter}>
               {selectedPhotoIndex + 1} / {photos.length}
             </ThemedText>
-          </ThemedView>
+          </View>
           
-          <Pressable 
-            className="flex-1 justify-center"
-            onPress={() => setModalVisible(false)}
-          >
+          {/* Image Container */}
+          <View style={styles.imageViewerContainer}>
             <Image
               source={{ uri: selectedPhoto.uri }}
-              className="w-full h-full"
+              style={styles.fullScreenImage}
               contentFit="contain"
+              transition={200}
             />
-            
-            {/* Navigation buttons */}
-            {photos.length > 1 && (
-              <>
-                <TouchableOpacity
-                  className="absolute w-15 h-15 rounded-full bg-black/30 items-center justify-center left-4"
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    navigateToPhoto('prev');
-                  }}
-                >
-                  <IconSymbol name="chevron.left" size={36} color="#FFFFFF" />
-                </TouchableOpacity>
-                
-                <TouchableOpacity
-                  className="absolute w-15 h-15 rounded-full bg-black/30 items-center justify-center right-4"
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    navigateToPhoto('next');
-                  }}
-                >
-                  <IconSymbol name="chevron.right" size={36} color="#FFFFFF" />
-                </TouchableOpacity>
-              </>
-            )}
-          </Pressable>
+          </View>
           
-          <ThemedView className="p-4">
+          {/* Navigation overlay */}
+          {photos.length > 1 && (
+            <View style={styles.navOverlay}>
+              <TouchableOpacity
+                style={styles.navButtonLeft}
+                onPress={() => navigateToPhoto('prev')}
+              >
+                <IconSymbol name="chevron.left" size={36} color="#FFFFFF" />
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={styles.navButtonRight}
+                onPress={() => navigateToPhoto('next')}
+              >
+                <IconSymbol name="chevron.right" size={36} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
+          )}
+          
+          {/* Footer */}
+          <View style={styles.modalFooter}>
             {selectedPhoto.title && (
-              <ThemedText className="text-white text-base font-medium mb-1">{selectedPhoto.title}</ThemedText>
+              <ThemedText style={styles.photoTitle}>{selectedPhoto.title}</ThemedText>
             )}
             
-            <ThemedText className="text-[#CCCCCC] text-sm">
+            <ThemedText style={styles.timestamp}>
               {formatTimestamp(selectedPhoto.timestamp)}
             </ThemedText>
-          </ThemedView>
-        </ThemedView>
+          </View>
+        </View>
       </Modal>
     );
   };
-  
+
   return (
     <ThemedView className="mb-6">
       {title && <ThemedText type="subtitle" className="mb-4">{title} ({photos.length})</ThemedText>}
       
-      {renderPhotoGrid()}
+      <ThemedView style={{minHeight: photos.length > 0 ? 200 : 'auto', maxHeight: 320}}>
+        {photos.length === 0 ? (
+          <ThemedView className="items-center justify-center p-8 border border-[#E4E7EB] dark:border-gray-700 border-dashed rounded-lg">
+            <IconSymbol name="photo.fill" size={32} color={colors.icon} />
+            <ThemedText className="mt-2 text-[#687076] dark:text-gray-400">No photos available</ThemedText>
+          </ThemedView>
+        ) : renderSimpleGrid()}
+      </ThemedView>
       {renderPhotoViewer()}
     </ThemedView>
   );
 }
 
-// NativeWind classes replace StyleSheet
+const { width, height } = Dimensions.get('window');
+
+const styles = StyleSheet.create({
+  // Grid Styles
+  imageContainer: {
+    flex: 1,
+    borderRadius: 8,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  image: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+  },
+  loaderContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.1)',
+    zIndex: 1,
+  },
+  errorContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F3F4F6',
+    borderRadius: 8,
+    padding: 8,
+  },
+  errorText: {
+    fontSize: 10,
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  
+  // Modal Styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.95)',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+  closeButton: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  photoCounter: {
+    color: '#FFFFFF',
+    fontSize: 16,
+  },
+  imageViewerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullScreenImage: {
+    width: width,
+    height: height - 180,
+  },
+  navOverlay: {
+    position: 'absolute',
+    top: 60,
+    bottom: 60,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    pointerEvents: 'box-none',
+  },
+  navButtonLeft: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navButtonRight: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalFooter: {
+    padding: 16,
+  },
+  photoTitle: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  timestamp: {
+    color: '#CCCCCC',
+    fontSize: 14,
+  },
+});
