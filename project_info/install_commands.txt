@@ -1,3 +1,0 @@
-
-# Install React Native Gifted Charts and dependencies
-npx expo install react-native-gifted-charts expo-linear-gradient react-native-svg
