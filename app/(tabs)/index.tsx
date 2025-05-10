@@ -6,14 +6,14 @@ import { ActivityIndicator, View } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { IssueBarChart, RecentActivityItem, StatisticCard } from '@/components/dashboard';
+import { IssueBarChart, RecentActivityItem, StatisticCard, StatusBarChart } from '@/components/dashboard';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { Button } from '@/components/ui/Button';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useIssues } from '@/contexts/IssueContext';
-import { IssueSeverity } from '@/types/models/Issue';
+import { IssueSeverity, IssueStatus } from '@/types/models/Issue';
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -41,6 +41,12 @@ export default function HomeScreen() {
           [IssueSeverity.Medium]: 0,
           [IssueSeverity.High]: 0,
         },
+        byStatus: {
+          [IssueStatus.New]: 0,
+          [IssueStatus.Assigned]: 0,
+          [IssueStatus.InProgress]: 0,
+          [IssueStatus.Resolved]: 0,
+        },
         recentIssues: []
       };
     }
@@ -52,6 +58,14 @@ export default function HomeScreen() {
       [IssueSeverity.High]: issues.filter(i => i.severity === IssueSeverity.High).length,
     };
     
+    // Calculate by status
+    const byStatus = {
+      [IssueStatus.New]: issues.filter(i => i.status === IssueStatus.New).length,
+      [IssueStatus.Assigned]: issues.filter(i => i.status === IssueStatus.Assigned).length,
+      [IssueStatus.InProgress]: issues.filter(i => i.status === IssueStatus.InProgress).length,
+      [IssueStatus.Resolved]: issues.filter(i => i.status === IssueStatus.Resolved).length,
+    };
+    
     // Get 5 most recent issues
     const recentIssues = [...issues]
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
@@ -60,6 +74,7 @@ export default function HomeScreen() {
     return {
       total: issues.length,
       bySeverity,
+      byStatus,
       recentIssues
     };
   };
@@ -93,6 +108,8 @@ export default function HomeScreen() {
     return (
       <>
         {/* Issue Stats Cards */}
+        {/* Issue Stats Cards - Severity */}
+        <ThemedText type="subtitle" className="mb-3">By Severity</ThemedText>
         <ThemedView className="flex-row flex-wrap gap-3 mb-6 md:gap-4">
           <StatisticCard
             value={stats.total}
@@ -100,6 +117,7 @@ export default function HomeScreen() {
             borderColor={colorScheme === 'dark' ? '#FFFFFF' : '#444444'}
             iconName="tray.fill"
             iconColor={colors.icon}
+            navigateToFilter={null} // Navigate to all issues (no filter)
           />
           
           <StatisticCard
@@ -110,6 +128,10 @@ export default function HomeScreen() {
             labelColor="#E11D48"
             iconName="exclamationmark.triangle.fill"
             iconColor="#E11D48"
+            navigateToFilter={{
+              type: 'severity',
+              value: IssueSeverity.High
+            }}
           />
           
           <StatisticCard
@@ -120,6 +142,10 @@ export default function HomeScreen() {
             labelColor="#F59E0B"
             iconName="exclamationmark.circle.fill"
             iconColor="#F59E0B"
+            navigateToFilter={{
+              type: 'severity',
+              value: IssueSeverity.Medium
+            }}
           />
           
           <StatisticCard
@@ -130,10 +156,75 @@ export default function HomeScreen() {
             labelColor="#10B981"
             iconName="checkmark.circle.fill"
             iconColor="#10B981"
+            navigateToFilter={{
+              type: 'severity',
+              value: IssueSeverity.Low
+            }}
+          />
+        </ThemedView>
+        
+        {/* Issue Stats Cards - Status */}
+        <ThemedText type="subtitle" className="mb-3">By Status</ThemedText>
+        <ThemedView className="flex-row flex-wrap gap-3 mb-6 md:gap-4">
+          <StatisticCard
+            value={stats.byStatus[IssueStatus.New]}
+            label="New"
+            borderColor="#3B82F6"
+            valueColor="#3B82F6"
+            labelColor="#3B82F6"
+            iconName="plus.circle.fill"
+            iconColor="#3B82F6"
+            navigateToFilter={{
+              type: 'status',
+              value: IssueStatus.New
+            }}
+          />
+          
+          <StatisticCard
+            value={stats.byStatus[IssueStatus.Assigned]}
+            label="Assigned"
+            borderColor="#8B5CF6"
+            valueColor="#8B5CF6"
+            labelColor="#8B5CF6"
+            iconName="person.crop.circle.fill"
+            iconColor="#8B5CF6"
+            navigateToFilter={{
+              type: 'status',
+              value: IssueStatus.Assigned
+            }}
+          />
+          
+          <StatisticCard
+            value={stats.byStatus[IssueStatus.InProgress]}
+            label="In Progress"
+            borderColor="#F97316"
+            valueColor="#F97316"
+            labelColor="#F97316"
+            iconName="arrow.triangle.2.circlepath"
+            iconColor="#F97316"
+            navigateToFilter={{
+              type: 'status',
+              value: IssueStatus.InProgress
+            }}
+          />
+          
+          <StatisticCard
+            value={stats.byStatus[IssueStatus.Resolved]}
+            label="Resolved"
+            borderColor="#10B981"
+            valueColor="#10B981"
+            labelColor="#10B981"
+            iconName="checkmark.seal.fill"
+            iconColor="#10B981"
+            navigateToFilter={{
+              type: 'status',
+              value: IssueStatus.Resolved
+            }}
           />
         </ThemedView>
         
         {/* Issue Chart */}
+        <ThemedText type="subtitle" className="mb-3">Issue Visualization</ThemedText>
         <IssueBarChart data={stats.bySeverity} total={stats.total} />
         
         {/* Quick Actions */}

@@ -152,7 +152,6 @@ export function PhotoGallery({ photos, title = 'Photos', onPhotoRemove }: PhotoG
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
               <IconSymbol name="trash.fill" size={16} color="#FFFFFF" />
-              <Text style={{ color: 'white', fontWeight: 'bold', marginLeft: 6 }}>DELETE</Text>
             </TouchableOpacity>
           )}
       </View>

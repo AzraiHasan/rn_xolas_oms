@@ -1,14 +1,12 @@
-import Constants from 'expo-constants';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Alert, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Alert, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PhotoGallery } from '@/components/photos';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { Button } from '@/components/ui/Button';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -208,7 +206,18 @@ export default function IssueDetailScreen() {
           />
           <ThemedText style={styles.errorText}>{error || 'Issue not found'}</ThemedText>
           <Link href="/(tabs)/issues" asChild>
-            <Button label="View All Issues" variant="primary" />
+            <Pressable
+              className="py-3 md:py-4 rounded-lg items-center justify-center mx-1 border"
+              style={{
+                backgroundColor: colors.tint,
+                borderColor: colors.tint,
+                paddingHorizontal: 16
+              }}
+            >
+              <ThemedText style={{ color: '#FFFFFF' }} className="font-medium md:text-base">
+                View All Issues
+              </ThemedText>
+            </Pressable>
           </Link>
         </ThemedView>
       </SafeAreaView>
@@ -274,26 +283,37 @@ export default function IssueDetailScreen() {
       
       {/* Action Buttons - Fixed at bottom */}
       <ThemedView style={styles.actionsContainer}>
-        <View style={{width: '48%', maxWidth: 150, height: 50}}>
-          <Button
-            label=""
-            variant="secondary"
-            leftIcon={<IconSymbol size={22} name="pencil" color={colors.tint} />}
-            onPress={() => {
-              Alert.alert('Coming Soon', 'Edit functionality will be implemented in a future sprint.');
-            }}
-            style={{height: 50}}
-          />
-        </View>
-        <View style={{width: '48%', maxWidth: 150, height: 50}}>
-          <Button
-            label=""
-            variant="danger"
-            leftIcon={<IconSymbol size={22} name="trash.fill" color="#FFFFFF" />}
-            onPress={handleDeleteIssue}
-            style={{height: 50}}
-          />
-        </View>
+        <Pressable
+          className="flex-1 py-3 md:py-4 rounded-lg items-center justify-center mx-2 border"
+          style={{
+            backgroundColor: 'transparent',
+            borderColor: '#2563EB'
+          }}
+          onPress={() => {
+            Alert.alert('Coming Soon', 'Edit functionality will be implemented in a future sprint.');
+          }}
+        >
+          <ThemedView className="flex-row items-center justify-center">
+            <IconSymbol size={20} name="pencil" color="#2563EB" />
+            <ThemedText className="font-medium md:text-base ml-2" style={{ color: '#2563EB' }}>Edit</ThemedText>
+          </ThemedView>
+        </Pressable>
+        
+        <Pressable
+          className="flex-1 py-3 md:py-4 rounded-lg items-center justify-center mx-2 border"
+          style={{
+            backgroundColor: 'transparent',
+            borderColor: '#E11D48'
+          }}
+          onPress={handleDeleteIssue}
+        >
+          <ThemedView className="flex-row items-center justify-center">
+            <IconSymbol size={20} name="trash.fill" color="#E11D48" />
+            <ThemedText className="font-medium md:text-base ml-2" style={{ color: '#E11D48' }}>
+              Delete
+            </ThemedText>
+          </ThemedView>
+        </Pressable>
       </ThemedView>
     </SafeAreaView>
   );
@@ -302,7 +322,6 @@ export default function IssueDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Constants.statusBarHeight,
   },
   scrollView: {
     flex: 1,

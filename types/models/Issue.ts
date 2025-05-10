@@ -9,6 +9,13 @@ export enum IssueSeverity {
   High = "High"
 }
 
+export enum IssueStatus {
+  New = "New",
+  Assigned = "Assigned",
+  InProgress = "In Progress",
+  Resolved = "Resolved"
+}
+
 export interface Photo {
   /** Unique identifier for the photo asset */
   id: string;
@@ -33,6 +40,8 @@ export interface IssueReport {
   timestamp: string;
   /** Issue criticality classification */
   severity: IssueSeverity;
+  /** Current status of the issue */
+  status: IssueStatus;
   /** Collection of photos documenting the issue */
   photos: Photo[];
 }

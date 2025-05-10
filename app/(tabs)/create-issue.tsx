@@ -5,12 +5,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
-import { FormField, TextAreaField, SeveritySelector } from '@/components/forms';
+import { FormField, TextAreaField, SeveritySelector, DropdownField } from '@/components/forms';
 import { PhotoPicker } from '@/components/photos/fixed/PhotoPicker';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useForm } from '@/hooks/forms/useForm';
-import { IssueReportInput, IssueSeverity, Photo } from '@/types/models/Issue';
+import { IssueReportInput, IssueSeverity, IssueStatus, Photo } from '@/types/models/Issue';
 import { requiredValidator, minLengthValidator } from '@/utils/validation';
 import { useIssues } from '@/contexts/IssueContext';
 
@@ -35,6 +35,7 @@ export default function CreateIssueScreen() {
       description: '',
       location: '',
       severity: IssueSeverity.Medium,
+      status: IssueStatus.New,
       photos: [],
       timestamp: new Date().toISOString()
     },
@@ -170,6 +171,22 @@ export default function CreateIssueScreen() {
           required
           value={values.severity || IssueSeverity.Medium}
           onChange={(severity) => handleChange('severity', severity)}
+        />
+
+        <DropdownField
+          label="Status"
+          required
+          placeholder="Select a status"
+          value={values.status || IssueStatus.New}
+          options={[
+            { value: IssueStatus.New, label: 'New' },
+            { value: IssueStatus.Assigned, label: 'Assigned' },
+            { value: IssueStatus.InProgress, label: 'In Progress' },
+            { value: IssueStatus.Resolved, label: 'Resolved' }
+          ]}
+          onChange={(status) => handleChange('status', status)}
+          isError={!!errors.status}
+          error={errors.status}
         />
 
         <PhotoPicker
