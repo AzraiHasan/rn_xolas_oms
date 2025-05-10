@@ -41,20 +41,20 @@ Confirm "Recent Activity" shows latest issues (or empty state)
 - Check photos are displayed correctly in the gallery - PASSED
 
 
-6. Test photo deletion - FAILED
+6. Test photo deletion - PASSED
 
-- In issue details, tap the X on a photo - FAILED
-- Confirm photo removal prompt -PENDING
-- Verify photo is removed from the gallery - PENDING
+- In issue details, tap the X on a photo - PASSED
+- Confirm photo removal prompt -PASSED
+- Verify photo is removed from the gallery - PASSED
 
 
-7. Test issue deletion - PENDING
+7. Test issue deletion - PASSED
 
-- In issue details, tap "Delete Issue"
-- Confirm deletion prompt
-- Verify redirect to dashboard
-- Confirm issue is removed from dashboard statistics
-- Navigate to Issues tab and verify issue no longer appears
+- In issue details, tap "Delete Issue" - PASSED
+- Confirm deletion prompt - PASSED
+- Verify redirect to dashboard - PASSED 
+- Confirm issue is removed from dashboard statistics - PASSED
+- Navigate to Issues tab and verify issue no longer appears - PASSED
 
 
 8. Test offline persistence - PENDING

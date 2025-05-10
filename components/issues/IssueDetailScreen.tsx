@@ -166,26 +166,7 @@ export function IssueDetailScreen({ issueId }: IssueDetailScreenProps) {
       <StatusBar style="light" />
       
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        {/* Floating Delete Button Test */}
-        <View style={{
-          position: 'absolute',
-          bottom: 20,
-          right: 20,
-          zIndex: 999,
-          backgroundColor: 'red',
-          padding: 10,
-          borderRadius: 50,
-          elevation: 5
-        }}>
-          <TouchableOpacity
-            onPress={() => {
-              console.log('FLOATING BUTTON PRESSED');
-              Alert.alert('Floating button', 'Floating button pressed!');
-            }}
-          >
-            <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>DELETE</Text>
-          </TouchableOpacity>
-        </View>
+        {/* Removed floating Delete button */}
         {/* Issue Header */}
         <ThemedView style={styles.issueHeader}>
           <ThemedView style={[
@@ -308,31 +289,34 @@ export function IssueDetailScreen({ issueId }: IssueDetailScreenProps) {
           </View>
         </ThemedView>
         
-        {/* Action Buttons */}
-        <ThemedView style={styles.actionsContainer}>
+      </ScrollView>
+      
+      {/* Action Buttons - Fixed positioning at bottom */}
+      <View style={styles.actionsContainer}>
+        <View style={{width: '48%'}}>
           <Button
-            label="Edit Issue"
+            label=""
             variant="secondary"
-            leftIcon={<IconSymbol size={18} name="pencil" color={colors.tint} />}
-            style={styles.actionButton}
+            leftIcon={<IconSymbol size={22} name="pencil" color={colors.tint} />}
             onPress={() => {
               // In a real app, navigate to edit screen
               alert('Edit functionality would be implemented here');
             }}
           />
+        </View>
+        <View style={{width: '48%'}}>
           <Button
-            label="Delete Issue"
+            label=""
             variant="danger"
-            leftIcon={<IconSymbol size={18} name="trash.fill" color="#FFFFFF" />}
-            style={styles.actionButton}
+            leftIcon={<IconSymbol size={22} name="trash.fill" color="#FFFFFF" />}
             onPress={() => {
               // In a real app, show confirmation dialog and delete
               alert('Issue would be deleted. Navigating back...');
               router.back();
             }}
           />
-        </ThemedView>
-      </ScrollView>
+        </View>
+      </ThemedView>
     </SafeAreaView>
   );
 }
@@ -347,6 +331,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
+    paddingBottom: 80, // Add extra padding at bottom to account for fixed action buttons
   },
   issueHeader: {
     flexDirection: 'row',
@@ -436,12 +421,21 @@ const styles = StyleSheet.create({
   actionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 12,
-    marginTop: 8,
-    marginBottom: 16,
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    width: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderTopWidth: 1,
+    borderTopColor: '#EEEEEE',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   actionButton: {
-    flex: 1,
+    width: '48%',
+    height: 50,
   },
   loadingContainer: {
     flex: 1,

@@ -2,7 +2,7 @@ import Constants from 'expo-constants';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Alert } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Alert, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PhotoGallery } from '@/components/photos';
@@ -123,7 +123,7 @@ export default function IssueDetailScreen() {
                   [
                     {
                       text: 'OK',
-                      onPress: () => router.navigate('/(tabs)/')
+                      onPress: () => router.navigate('/(tabs)')
                     }
                   ]
                 );
@@ -270,29 +270,31 @@ export default function IssueDetailScreen() {
             onPhotoRemove={handleRemovePhoto}
           />
         </ThemedView>
-        
-        {/* Action Buttons */}
-        <ThemedView style={styles.actionsContainer}>
+      </ScrollView>
+      
+      {/* Action Buttons - Fixed at bottom */}
+      <ThemedView style={styles.actionsContainer}>
+        <View style={{width: '48%', maxWidth: 150, height: 50}}>
           <Button
-            label="Edit Issue"
+            label=""
             variant="secondary"
-            leftIcon={<IconSymbol size={18} name="pencil" color={colors.tint} />}
-            style={styles.actionButton}
+            leftIcon={<IconSymbol size={22} name="pencil" color={colors.tint} />}
             onPress={() => {
-              // In a real app, navigate to edit screen
-              // For now, just show a message
               Alert.alert('Coming Soon', 'Edit functionality will be implemented in a future sprint.');
             }}
+            style={{height: 50}}
           />
+        </View>
+        <View style={{width: '48%', maxWidth: 150, height: 50}}>
           <Button
-            label="Delete Issue"
+            label=""
             variant="danger"
-            leftIcon={<IconSymbol size={18} name="trash.fill" color="#FFFFFF" />}
-            style={styles.actionButton}
+            leftIcon={<IconSymbol size={22} name="trash.fill" color="#FFFFFF" />}
             onPress={handleDeleteIssue}
+            style={{height: 50}}
           />
-        </ThemedView>
-      </ScrollView>
+        </View>
+      </ThemedView>
     </SafeAreaView>
   );
 }
@@ -307,6 +309,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
+    paddingBottom: 80, // Add extra padding for fixed buttons
   },
   issueHeader: {
     flexDirection: 'row',
@@ -364,9 +367,17 @@ const styles = StyleSheet.create({
   actionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 12,
-    marginTop: 8,
-    marginBottom: 16,
+    alignItems: 'center',
+    padding: 10,
+    paddingBottom: 15,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderTopWidth: 1,
+    borderTopColor: '#EEEEEE',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100,
   },
   actionButton: {
     flex: 1,
