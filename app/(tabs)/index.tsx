@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { Link } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -12,39 +12,59 @@ import { Button } from '@/components/ui/Button';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { IssueService } from '@/services/issues/issueService';
-import { IssueReport, IssueSeverity } from '@/types/models/Issue';
+import { useIssues } from '@/contexts/IssueContext';
+import { IssueSeverity } from '@/types/models/Issue';
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [stats, setStats] = useState<{
-    total: number;
-    bySeverity: Record<IssueSeverity, number>;
-    recentIssues: IssueReport[];
-  } | null>(null);
+  const { 
+    issues, 
+    loading, 
+    error, 
+    refreshIssues 
+  } = useIssues();
   
   // Fetch issue statistics on component mount
   useEffect(() => {
-    const fetchIssueStats = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const issueStats = await IssueService.getIssueStatistics();
-        setStats(issueStats);
-      } catch (err) {
-        setError('Failed to load issue statistics');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+    refreshIssues();
+  }, []);
+  
+  // Calculate statistics from issues
+  const calculateStats = () => {
+    if (!issues || issues.length === 0) {
+      return {
+        total: 0,
+        bySeverity: {
+          [IssueSeverity.Low]: 0,
+          [IssueSeverity.Medium]: 0,
+          [IssueSeverity.High]: 0,
+        },
+        recentIssues: []
+      };
+    }
+    
+    // Calculate by severity
+    const bySeverity = {
+      [IssueSeverity.Low]: issues.filter(i => i.severity === IssueSeverity.Low).length,
+      [IssueSeverity.Medium]: issues.filter(i => i.severity === IssueSeverity.Medium).length,
+      [IssueSeverity.High]: issues.filter(i => i.severity === IssueSeverity.High).length,
     };
     
-    fetchIssueStats();
-  }, []);
+    // Get 5 most recent issues
+    const recentIssues = [...issues]
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, 5);
+    
+    return {
+      total: issues.length,
+      bySeverity,
+      recentIssues
+    };
+  };
+  
+  const stats = calculateStats();
   
   const renderContent = () => {
     if (loading) {
@@ -64,23 +84,10 @@ export default function HomeScreen() {
           <Button 
             label="Retry" 
             variant="primary" 
-            onPress={() => {
-              setLoading(true);
-              IssueService.getIssueStatistics()
-                .then(data => setStats(data))
-                .catch(err => {
-                  console.error(err);
-                  setError('Failed to load issue statistics');
-                })
-                .finally(() => setLoading(false));
-            }} 
+            onPress={refreshIssues} 
           />
         </ThemedView>
       );
-    }
-    
-    if (!stats) {
-      return null;
     }
     
     return (
@@ -182,8 +189,7 @@ export default function HomeScreen() {
   
   return (
     <ParallaxScrollView
-    /* className="md:pb-12" */
-    headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
       headerImage={
         <Image
           source={require('@/assets/images/partial-react-logo.png')}
@@ -196,90 +202,3 @@ export default function HomeScreen() {
     </ParallaxScrollView>
   );
 }
-
-/* Legacy styles removed in favor of NativeWind classes */
-/*
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 16,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 24,
-  },
-  actionsContainer: {
-    marginBottom: 24,
-  },
-  actionsRow: {
-    flexDirection: 'row',
-    marginTop: 12,
-    gap: 12,
-  },
-  actionButton: {
-    flex: 1,
-  },
-  recentActivityContainer: {
-    marginBottom: 24,
-  },
-  sectionTitleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  viewAllLink: {
-    color: '#0086C9',
-    fontSize: 14,
-  },
-  recentIssuesList: {
-    borderWidth: 1,
-    borderColor: '#E4E7EB',
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 32,
-    borderWidth: 1,
-    borderColor: '#E4E7EB',
-    borderRadius: 12,
-    marginTop: 12,
-  },
-  emptyStateText: {
-    marginTop: 8,
-    color: '#687076',
-  },
-  loadingContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 32,
-  },
-  loadingText: {
-    marginTop: 12,
-    color: '#687076',
-  },
-  errorContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 32,
-    gap: 12,
-  },
-  errorText: {
-    color: '#E11D48',
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
-*/

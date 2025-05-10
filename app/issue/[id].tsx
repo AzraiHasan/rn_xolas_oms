@@ -2,7 +2,7 @@ import Constants from 'expo-constants';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PhotoGallery } from '@/components/photos';
@@ -26,7 +26,13 @@ export default function IssueDetailScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   
-  const { getIssueById, loading: issuesLoading } = useIssues();
+  const { 
+    getIssueById, 
+    deleteIssue, 
+    removePhotoFromIssue,
+    loading: issuesLoading 
+  } = useIssues();
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [issue, setIssue] = useState<IssueReport | null>(null);
@@ -89,6 +95,92 @@ export default function IssueDetailScreen() {
       default:
         return 'circle.fill';
     }
+  };
+  
+  // Handle issue deletion
+  const handleDeleteIssue = () => {
+    if (!issue) return;
+    
+    Alert.alert(
+      'Delete Issue',
+      'Are you sure you want to delete this issue? This action cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel'
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const success = await deleteIssue(issue.id);
+              
+              if (success) {
+                Alert.alert(
+                  'Success',
+                  'Issue deleted successfully',
+                  [
+                    {
+                      text: 'OK',
+                      onPress: () => router.navigate('/(tabs)/')
+                    }
+                  ]
+                );
+              } else {
+                throw new Error('Failed to delete issue');
+              }
+            } catch (error) {
+              console.error('Error deleting issue:', error);
+              Alert.alert(
+                'Error',
+                'Failed to delete issue. Please try again.',
+                [{ text: 'OK' }]
+              );
+            }
+          }
+        }
+      ]
+    );
+  };
+  
+  // Handle photo deletion
+  const handleRemovePhoto = (photoId: string) => {
+    if (!issue) return;
+    
+    Alert.alert(
+      'Remove Photo',
+      'Are you sure you want to remove this photo?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel'
+        },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const updatedIssue = await removePhotoFromIssue(issue.id, photoId);
+              
+              if (updatedIssue) {
+                setIssue(updatedIssue);
+                Alert.alert('Success', 'Photo removed successfully');
+              } else {
+                throw new Error('Failed to remove photo');
+              }
+            } catch (error) {
+              console.error('Error removing photo:', error);
+              Alert.alert(
+                'Error',
+                'Failed to remove photo. Please try again.',
+                [{ text: 'OK' }]
+              );
+            }
+          }
+        }
+      ]
+    );
   };
   
   // Render content based on state
@@ -172,7 +264,11 @@ export default function IssueDetailScreen() {
         
         {/* Photos Section */}
         <ThemedView style={styles.sectionContainer}>
-          <PhotoGallery photos={issue.photos} title="Photos" />
+          <PhotoGallery 
+            photos={issue.photos} 
+            title="Photos" 
+            onPhotoRemove={handleRemovePhoto}
+          />
         </ThemedView>
         
         {/* Action Buttons */}
@@ -185,7 +281,7 @@ export default function IssueDetailScreen() {
             onPress={() => {
               // In a real app, navigate to edit screen
               // For now, just show a message
-              alert('Edit functionality would be implemented in Sprint 3');
+              Alert.alert('Coming Soon', 'Edit functionality will be implemented in a future sprint.');
             }}
           />
           <Button
@@ -193,12 +289,7 @@ export default function IssueDetailScreen() {
             variant="danger"
             leftIcon={<IconSymbol size={18} name="trash.fill" color="#FFFFFF" />}
             style={styles.actionButton}
-            onPress={() => {
-              // In a real app, show confirmation dialog and delete
-              // For now, just navigate back
-              alert('Issue would be deleted. Navigating back...');
-              router.back();
-            }}
+            onPress={handleDeleteIssue}
           />
         </ThemedView>
       </ScrollView>

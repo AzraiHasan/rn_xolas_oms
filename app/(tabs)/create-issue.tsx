@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import * as FileSystem from 'expo-file-system';
 import { StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -11,14 +10,13 @@ import { PhotoPicker } from '@/components/photos/fixed/PhotoPicker';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useForm } from '@/hooks/forms/useForm';
-import { IssueReportInput, IssueSeverity, Photo, IssueReport } from '@/types/models/Issue';
+import { IssueReportInput, IssueSeverity, Photo } from '@/types/models/Issue';
 import { requiredValidator, minLengthValidator } from '@/utils/validation';
-import { issueStorage, fileStorage } from '@/services/StorageService';
 import { useIssues } from '@/contexts/IssueContext';
 
 export default function CreateIssueScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { refreshIssues } = useIssues();
+  const { createIssue } = useIssues();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const router = useRouter();
@@ -57,38 +55,14 @@ export default function CreateIssueScreen() {
       try {
         setIsSubmitting(true);
         
-        // Process photos first - save them using the fileStorage service
-        const photoPromises = formValues.photos?.map(async (photo) => {
-          // Only process photos that have a URI and need to be saved
-          // We check if the URI is a local file that needs persistent storage
-          if (photo.uri && !photo.uri.startsWith(FileSystem.documentDirectory)) {
-            const savedPhoto = await fileStorage.saveImage(photo.uri, photo.title);
-            // Return a new photo object with the saved URI
-            return {
-              ...photo,
-              id: savedPhoto.id,
-              uri: savedPhoto.uri
-            };
-          }
-          // Photo already saved, return as is
-          return photo;
-        }) || [];
-
-        // Wait for all photos to be saved
-        const savedPhotos = await Promise.all(photoPromises);
-
-        // Create the complete issue report input with saved photos
+        // Create the complete issue report input
         const completeIssueInput: IssueReportInput = {
           ...formValues as IssueReportInput,
-          photos: savedPhotos,
           timestamp: new Date().toISOString()
         };
 
-        // Save the issue using issueStorage service
-        const savedIssue = await issueStorage.createIssue(completeIssueInput);
-        
-        // Refresh the issues list
-        await refreshIssues();
+        // Create the issue using the context
+        await createIssue(completeIssueInput);
         
         // Show success message
         Alert.alert(

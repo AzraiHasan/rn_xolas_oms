@@ -25,12 +25,17 @@ interface PhotoGalleryProps {
    * Title for the gallery section
    */
   title?: string;
+
+  /**
+   * Optional callback for photo removal
+   */
+  onPhotoRemove?: (photoId: string) => void;
 }
 
 /**
  * Component for displaying a grid of photos with fullscreen viewer
  */
-export function PhotoGallery({ photos, title = 'Photos' }: PhotoGalleryProps) {
+export function PhotoGallery({ photos, title = 'Photos', onPhotoRemove }: PhotoGalleryProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   
@@ -65,6 +70,13 @@ export function PhotoGallery({ photos, title = 'Photos' }: PhotoGalleryProps) {
     }
   };
   
+  // Handle photo removal
+  const handleRemovePhoto = (photoId: string) => {
+    if (onPhotoRemove) {
+      onPhotoRemove(photoId);
+    }
+  };
+  
   // Render the photo grid
   const renderPhotoGrid = () => {
     if (photos.length === 0) {
@@ -90,6 +102,14 @@ export function PhotoGallery({ photos, title = 'Photos' }: PhotoGalleryProps) {
               className="flex-1 rounded-lg"
               contentFit="cover"
             />
+            {onPhotoRemove && (
+              <TouchableOpacity
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 items-center justify-center"
+                onPress={() => handleRemovePhoto(photo.id)}
+              >
+                <IconSymbol name="xmark" size={16} color="#FFFFFF" />
+              </TouchableOpacity>
+            )}
           </TouchableOpacity>
         ))}
       </ThemedView>
