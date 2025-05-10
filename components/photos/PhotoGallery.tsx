@@ -8,11 +8,13 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   View,
-  StyleSheet
+  StyleSheet,
+  Text
 } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { Button } from '@/components/ui/Button';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -89,67 +91,91 @@ export function PhotoGallery({ photos, title = 'Photos', onPhotoRemove }: PhotoG
   }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(false);
+    const colorScheme = useColorScheme();
+    const colors = Colors[colorScheme ?? 'light'];
     
     return (
-      <TouchableOpacity 
-        className="w-1/3 aspect-square p-1.5 md:w-1/4 lg:w-1/5"
-        onPress={() => onPress(index)}
-        activeOpacity={0.7}
-      >
-        <View style={styles.imageContainer}>
-          {isLoading && (
-            <View style={styles.loaderContainer}>
-              <ActivityIndicator size="small" color={colors.tint} />
-            </View>
-          )}
-          
-          {error ? (
-            <View style={[styles.errorContainer, { backgroundColor: colors.card }]}>
-              <IconSymbol name="exclamationmark.triangle" size={20} color={colors.error || '#E11D48'} />
-              <ThemedText style={styles.errorText}>Failed to load</ThemedText>
-            </View>
-          ) : (
-            <Image
-              source={{ uri: photo.uri }}
-              className="flex-1 rounded-lg"
-              contentFit="cover"
-              style={styles.image}
-              onLoadStart={() => setIsLoading(true)}
-              onLoad={() => setIsLoading(false)}
-              onError={() => {
-                setIsLoading(false);
-                setError(true);
-                console.error(`Failed to load image: ${photo.uri}`);
-              }}
-            />
-          )}
-          
+      <View className="w-1/3 aspect-square p-1.5 md:w-1/4 lg:w-1/5">
+        <TouchableOpacity 
+          className="rounded-lg overflow-hidden mb-1"
+          onPress={() => onPress(index)}
+          activeOpacity={0.7}
+          style={{aspectRatio: 1}}
+        >
+          <View style={styles.imageContainer}>
+            {isLoading && (
+              <View style={styles.loaderContainer}>
+                <ActivityIndicator size="small" color={colors.tint} />
+              </View>
+            )}
+            
+            {error ? (
+              <View style={[styles.errorContainer, { backgroundColor: colors.card }]}>
+                <IconSymbol name="exclamationmark.triangle" size={20} color={colors.error || '#E11D48'} />
+                <ThemedText style={styles.errorText}>Failed to load</ThemedText>
+              </View>
+            ) : (
+              <Image
+                source={{ uri: photo.uri }}
+                className="flex-1"
+                contentFit="cover"
+                style={styles.image}
+                onLoadStart={() => setIsLoading(true)}
+                onLoad={() => setIsLoading(false)}
+                onError={() => {
+                  setIsLoading(false);
+                  setError(true);
+                  console.error(`Failed to load image: ${photo.uri}`);
+                }}
+              />
+            )}
+          </View>
+        </TouchableOpacity>
+        
+          {/* Separate delete button below the photo */}
           {onRemove && (
             <TouchableOpacity
-              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 items-center justify-center"
-              onPress={() => onRemove(photo.id)}
+              style={{
+                backgroundColor: '#E11D48',
+                padding: 10,
+                borderRadius: 4,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 8
+              }}
+              onPress={() => {
+                console.log('Delete TouchableOpacity pressed for photo:', photo.id);
+                onRemove(photo.id);
+              }}
+              activeOpacity={0.7}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <IconSymbol name="xmark" size={16} color="#FFFFFF" />
+              <IconSymbol name="trash.fill" size={16} color="#FFFFFF" />
+              <Text style={{ color: 'white', fontWeight: 'bold', marginLeft: 6 }}>DELETE</Text>
             </TouchableOpacity>
           )}
-        </View>
-      </TouchableOpacity>
+      </View>
     );
   });
   
   // Simple grid layout to avoid FlatList nesting issues
   const renderSimpleGrid = () => {
+    console.log('PhotoGallery: onPhotoRemove available?', !!onPhotoRemove);
     return (
       <ThemedView className="flex-row flex-wrap">
-        {photos.map((photo, index) => (
-          <PhotoItem
-            key={photo.id}
-            photo={photo}
-            index={index}
-            onPress={openPhotoViewer}
-            onRemove={onPhotoRemove}
-          />
-        ))}
+        {photos.map((photo, index) => {
+          console.log(`Rendering photo ${photo.id} with delete handler: ${!!onPhotoRemove}`);
+          return (
+            <PhotoItem
+              key={photo.id}
+              photo={photo}
+              index={index}
+              onPress={openPhotoViewer}
+              onRemove={onPhotoRemove}
+            />
+          );
+        })}
       </ThemedView>
     );
   };

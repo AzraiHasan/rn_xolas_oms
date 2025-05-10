@@ -34,18 +34,18 @@ Confirm "Recent Activity" shows latest issues (or empty state)
 - Verify issue details match what was entered
 
 
-5. View issue details - FAILED
+5. View issue details - PASSED
 
 - Tap on the created issue in the list - PASSED
 - Verify all details match input data - PASSED
-- Check photos are displayed correctly in the gallery - FAILED
+- Check photos are displayed correctly in the gallery - PASSED
 
 
-6. Test photo deletion - PENDING
+6. Test photo deletion - FAILED
 
-- In issue details, tap the X on a photo
-- Confirm photo removal prompt
-- Verify photo is removed from the gallery
+- In issue details, tap the X on a photo - FAILED
+- Confirm photo removal prompt -PENDING
+- Verify photo is removed from the gallery - PENDING
 
 
 7. Test issue deletion - PENDING

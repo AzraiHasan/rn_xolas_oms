@@ -1,4 +1,9 @@
 import { Tabs } from 'expo-router';
+
+// Disallow access to test tab
+export const unstable_settings = {
+  initialRouteName: 'index',
+};
 import React from 'react';
 import { Platform } from 'react-native';
 

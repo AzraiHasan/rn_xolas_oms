@@ -1,0 +1,99 @@
+import React from 'react';
+import { View, StyleSheet, ScrollView, Alert, TouchableOpacity, Text } from 'react-native';
+import { Link } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+import { Button } from '@/components/ui/Button';
+import { IconSymbol } from '@/components/ui/IconSymbol';
+import { AppHeader } from '@/components/layout/AppHeader';
+
+export default function TestScreen() {
+  const onBasicPress = () => {
+    console.log('DIRECT BUTTON PRESS DETECTED');
+    Alert.alert('Success', 'Button press detected!');
+  };
+  
+  return (
+    <SafeAreaView style={styles.container}>
+      <AppHeader title="Test Pages" />
+      
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+        <ThemedText type="title" style={styles.title}>Testing Utilities</ThemedText>
+        
+        <ThemedText style={styles.description}>
+          These pages are for testing specific functionality in isolation.
+        </ThemedText>
+        
+        <ThemedView style={styles.buttonContainer}>
+          <Link href="/test/button" asChild>
+            <Button 
+              label="Button Test Page" 
+              variant="primary"
+              leftIcon={<IconSymbol name="button.programmable" size={20} color="#000" />}
+              style={styles.button}
+            />
+          </Link>
+          
+          <Link href="/test/basic" asChild>
+            <Button 
+              label="Basic Button Test" 
+              variant="primary"
+              leftIcon={<IconSymbol name="exclamationmark.triangle" size={20} color="#000" />}
+              style={styles.button}
+            />
+          </Link>
+          
+          {/* Direct TouchableOpacity test */}
+          <TouchableOpacity 
+            style={styles.nativeButton}
+            onPress={onBasicPress}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.nativeButtonText}>DIRECT TOUCHABLE TEST</Text>
+          </TouchableOpacity>
+        </ThemedView>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  content: {
+    padding: 16,
+  },
+  title: {
+    fontSize: 28,
+    marginBottom: 16,
+  },
+  description: {
+    fontSize: 16,
+    marginBottom: 24,
+    lineHeight: 22,
+  },
+  buttonContainer: {
+    gap: 16,
+  },
+  button: {
+    marginBottom: 8,
+  },
+  nativeButton: {
+    backgroundColor: '#E11D48',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  nativeButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  }
+});

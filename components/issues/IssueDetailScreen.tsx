@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, View, StyleSheet } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { ActivityIndicator, ScrollView, View, StyleSheet, Alert, Pressable, Text, TouchableOpacity, Button as NativeButton } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import Constants from 'expo-constants';
@@ -26,7 +27,7 @@ export function IssueDetailScreen({ issueId }: IssueDetailScreenProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   
-  const { getIssueById, loading: issuesLoading } = useIssues();
+  const { getIssueById, loading: issuesLoading, removePhotoFromIssue } = useIssues();
   const { getIssueStatus, syncNow } = useSyncContext();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,6 +56,39 @@ export function IssueDetailScreen({ issueId }: IssueDetailScreenProps) {
     }
   }, [issueId, getIssueById]);
   
+  // Handle photo removal with confirmation
+  const handlePhotoRemove = useCallback((photoId: string) => {
+    console.log('handlePhotoRemove called with photoId:', photoId);
+    Alert.alert(
+      'Remove Photo',
+      'Are you sure you want to remove this photo?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: async () => {
+            if (issue) {
+              try {
+                const updatedIssue = await removePhotoFromIssue(issue.id, photoId);
+                if (updatedIssue) {
+                  setIssue(updatedIssue);
+                }
+              } catch (err) {
+                console.error('Failed to remove photo:', err);
+                Alert.alert('Error', 'Failed to remove photo. Please try again.');
+              }
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  }, [issue, removePhotoFromIssue]);
+
   // Format timestamp to a readable date
   const formatTimestamp = (timestamp: string): string => {
     return new Date(timestamp).toLocaleDateString(undefined, {
@@ -132,6 +166,26 @@ export function IssueDetailScreen({ issueId }: IssueDetailScreenProps) {
       <StatusBar style="light" />
       
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        {/* Floating Delete Button Test */}
+        <View style={{
+          position: 'absolute',
+          bottom: 20,
+          right: 20,
+          zIndex: 999,
+          backgroundColor: 'red',
+          padding: 10,
+          borderRadius: 50,
+          elevation: 5
+        }}>
+          <TouchableOpacity
+            onPress={() => {
+              console.log('FLOATING BUTTON PRESSED');
+              Alert.alert('Floating button', 'Floating button pressed!');
+            }}
+          >
+            <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>DELETE</Text>
+          </TouchableOpacity>
+        </View>
         {/* Issue Header */}
         <ThemedView style={styles.issueHeader}>
           <ThemedView style={[
@@ -184,9 +238,74 @@ export function IssueDetailScreen({ issueId }: IssueDetailScreenProps) {
           <ThemedText style={styles.description}>{issue.description}</ThemedText>
         </ThemedView>
         
-        {/* Photos Section */}
-        <ThemedView style={styles.sectionContainer}>
-          <PhotoGallery photos={issue.photos} title="Photos" />
+        {/* Photos Section with Native Button */}
+        <ThemedView style={{marginBottom: 24}}>
+          <ThemedText type="subtitle">Photos ({issue.photos.length})</ThemedText>
+          
+          {issue.photos.length === 0 ? (
+            <ThemedView className="items-center justify-center p-8 border border-[#E4E7EB] dark:border-gray-700 border-dashed rounded-lg mt-4">
+              <IconSymbol name="photo.fill" size={32} color={colors.icon} />
+              <ThemedText className="mt-2 text-[#687076] dark:text-gray-400">No photos available</ThemedText>
+            </ThemedView>
+          ) : (
+            <ScrollView horizontal={true} style={{marginTop: 12}}>
+              {issue.photos.map(photo => (
+                <View key={photo.id} style={{width: 200, height: 250, marginRight: 12}}>
+                  <Image
+                    source={{ uri: photo.uri }}
+                    style={{width: 200, height: 200, borderRadius: 8}}
+                    contentFit="cover"
+                  />
+                  <View style={{marginTop: 8}}>
+                    <NativeButton
+                      title="DELETE PHOTO"
+                      color="#E11D48"
+                      onPress={() => {
+                        console.log('Native button pressed for photo:', photo.id);
+                        Alert.alert(
+                          'Delete Photo',
+                          'Are you sure you want to delete this photo?',
+                          [
+                            { text: 'Cancel', style: 'cancel' },
+                            { 
+                              text: 'Delete', 
+                              style: 'destructive',
+                              onPress: () => {
+                                console.log('Delete confirmed for photo:', photo.id);
+                                removePhotoFromIssue(issue.id, photo.id)
+                                  .then(updatedIssue => {
+                                    if (updatedIssue) {
+                                      console.log('Photo deleted successfully');
+                                      setIssue(updatedIssue);
+                                    }
+                                  })
+                                  .catch(err => {
+                                    console.error('Error deleting photo:', err);
+                                    Alert.alert('Error', 'Failed to delete photo');
+                                  });
+                              }
+                            }
+                          ]
+                        );
+                      }}
+                    />
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          )}
+          
+          {/* Test Button */}
+          <View style={{marginTop: 16}}>
+            <NativeButton 
+              title="TEST BUTTON - PRESS ME" 
+              onPress={() => {
+                console.log('TEST BUTTON PRESSED!');
+                Alert.alert('Test', 'Test button was pressed successfully!');
+              }}
+              color="#000000"
+            />
+          </View>
         </ThemedView>
         
         {/* Action Buttons */}
@@ -284,6 +403,35 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     marginTop: 8,
+  },
+  // New styles for improved photo gallery
+  photoViewer: {
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  photoContainer: {
+    width: 200,
+    height: 200,
+    marginRight: 12,
+    borderRadius: 8,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  photoImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+  },
+  photoActions: {
+    position: 'absolute',
+    bottom: 10,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteButton: {
+    minWidth: 90,
   },
   actionsContainer: {
     flexDirection: 'row',
