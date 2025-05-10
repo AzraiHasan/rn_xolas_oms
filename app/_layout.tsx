@@ -8,6 +8,7 @@ import 'react-native-reanimated';
 import '../global.css';
 
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { IssueProvider } from '@/contexts/IssueContext';
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -20,7 +21,9 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
-      <RootLayoutNavigation />
+      <IssueProvider>
+        <RootLayoutNavigation />
+      </IssueProvider>
     </ThemeProvider>
   );
 }

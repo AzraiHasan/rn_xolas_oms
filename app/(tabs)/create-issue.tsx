@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import * as FileSystem from 'expo-file-system';
 import { StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -6,14 +7,18 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import { FormField, TextAreaField, SeveritySelector } from '@/components/forms';
-import { PhotoPicker } from '@/components/photos';
+import { PhotoPicker } from '@/components/photos/fixed/PhotoPicker';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useForm } from '@/hooks/forms/useForm';
-import { IssueReportInput, IssueSeverity, Photo } from '@/types/models/Issue';
+import { IssueReportInput, IssueSeverity, Photo, IssueReport } from '@/types/models/Issue';
 import { requiredValidator, minLengthValidator } from '@/utils/validation';
+import { issueStorage, fileStorage } from '@/services/StorageService';
+import { useIssues } from '@/contexts/IssueContext';
 
 export default function CreateIssueScreen() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { refreshIssues } = useIssues();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const router = useRouter();
@@ -48,18 +53,64 @@ export default function CreateIssueScreen() {
         requiredValidator
       ]
     },
-    onSubmit: (formValues) => {
-      // Here would be the call to save the new issue
-      Alert.alert(
-        'Success',
-        'New issue created successfully',
-        [
-          {
-            text: 'OK',
-            onPress: () => router.navigate('/(tabs)/')
+    onSubmit: async (formValues) => {
+      try {
+        setIsSubmitting(true);
+        
+        // Process photos first - save them using the fileStorage service
+        const photoPromises = formValues.photos?.map(async (photo) => {
+          // Only process photos that have a URI and need to be saved
+          // We check if the URI is a local file that needs persistent storage
+          if (photo.uri && !photo.uri.startsWith(FileSystem.documentDirectory)) {
+            const savedPhoto = await fileStorage.saveImage(photo.uri, photo.title);
+            // Return a new photo object with the saved URI
+            return {
+              ...photo,
+              id: savedPhoto.id,
+              uri: savedPhoto.uri
+            };
           }
-        ]
-      );
+          // Photo already saved, return as is
+          return photo;
+        }) || [];
+
+        // Wait for all photos to be saved
+        const savedPhotos = await Promise.all(photoPromises);
+
+        // Create the complete issue report input with saved photos
+        const completeIssueInput: IssueReportInput = {
+          ...formValues as IssueReportInput,
+          photos: savedPhotos,
+          timestamp: new Date().toISOString()
+        };
+
+        // Save the issue using issueStorage service
+        const savedIssue = await issueStorage.createIssue(completeIssueInput);
+        
+        // Refresh the issues list
+        await refreshIssues();
+        
+        // Show success message
+        Alert.alert(
+          'Success',
+          'New issue created successfully',
+          [
+            {
+              text: 'OK',
+              onPress: () => router.navigate('/(tabs)/')
+            }
+          ]
+        );
+      } catch (error) {
+        console.error('Failed to create issue:', error);
+        Alert.alert(
+          'Error',
+          'Failed to create issue. Please try again.',
+          [{ text: 'OK' }]
+        );
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   });
 
@@ -70,6 +121,9 @@ export default function CreateIssueScreen() {
 
   // Handle manual form submission with additional UI feedback
   const handleFormSubmit = () => {
+    // Prevent multiple submissions
+    if (isSubmitting) return;
+    
     // Run form validation
     const isFormValid = validateForm();
     
@@ -154,11 +208,15 @@ export default function CreateIssueScreen() {
         <Pressable
           style={[
             styles.submitButton,
-            { backgroundColor: colors.primary }
+            { backgroundColor: colors.primary },
+            isSubmitting && { opacity: 0.7 }
           ]}
           onPress={handleFormSubmit}
+          disabled={isSubmitting}
         >
-          <ThemedText style={styles.submitButtonText}>Create Issue</ThemedText>
+          <ThemedText style={styles.submitButtonText}>
+            {isSubmitting ? 'Saving...' : 'Create Issue'}
+          </ThemedText>
         </Pressable>
       </ScrollView>
     </ThemedView>

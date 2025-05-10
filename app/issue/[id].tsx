@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/Button';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { IssueService } from '@/services/issues/issueService';
+import { useIssues } from '@/contexts/IssueContext';
 import { IssueReport, IssueSeverity } from '@/types/models/Issue';
 
 /**
@@ -26,39 +26,33 @@ export default function IssueDetailScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   
+  const { getIssueById, loading: issuesLoading } = useIssues();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [issue, setIssue] = useState<IssueReport | null>(null);
   
-  // Fetch issue data
+  // Fetch issue data from context
   useEffect(() => {
-    const fetchIssue = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const issueData = await IssueService.getIssueById(issueId);
-        
-        if (issueData) {
-          setIssue(issueData);
-        } else {
-          setError('Issue not found');
-        }
-      } catch (err) {
-        console.error(err);
-        setError('Failed to load issue details');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    if (issueId) {
-      fetchIssue();
-    } else {
+    if (!issueId) {
       setError('Invalid issue ID');
       setLoading(false);
+      return;
     }
-  }, [issueId]);
+    
+    try {
+      const issueData = getIssueById(issueId);
+      setIssue(issueData || null);
+      
+      if (!issueData) {
+        setError('Issue not found');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Failed to load issue details');
+    } finally {
+      setLoading(false);
+    }
+  }, [issueId, getIssueById]);
   
   // Format timestamp to a readable date
   const formatTimestamp = (timestamp: string): string => {
@@ -98,7 +92,7 @@ export default function IssueDetailScreen() {
   };
   
   // Render content based on state
-  if (loading) {
+  if (loading || issuesLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar style="light" />
