@@ -26,22 +26,30 @@ export default function TabLayout() {
             position: 'absolute',
             backgroundColor: 'transparent',
             borderTopWidth: 0,
+            height: 70, // Increased height
+            paddingBottom: 15, // Increased bottom padding
           },
           android: {
             backgroundColor: colorScheme === 'dark' ? '#121212' : '#FFFFFF',
             elevation: 8,
+            height: 70, // Increased height
+            paddingBottom: 15, // Increased bottom padding
           },
           default: {
             backgroundColor: colorScheme === 'dark' ? '#121212' : '#FFFFFF',
+            height: 70, // Increased height
+            paddingBottom: 15, // Increased bottom padding
           },
         }),
         tabBarLabelStyle: {
           fontFamily: 'Inter',
           fontSize: 12,
-          paddingBottom: 4,
+          paddingBottom: 0,
+          marginTop: 1, // Reduced spacing between icon and text
         },
         tabBarIconStyle: {
-          marginTop: 4,
+          marginTop: 8,
+          marginBottom: 2, // Reduced spacing between icon and text
         },
       }}>
       <Tabs.Screen
@@ -58,13 +66,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="exclamationmark.circle.fill" color={color} />
         }}
       />
-      <Tabs.Screen
-        name="reports"
-        options={{
-          title: 'Reports',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="doc.text.fill" color={color} />
-        }}
-      />
+
       <Tabs.Screen
         name="create-issue"
         options={{
