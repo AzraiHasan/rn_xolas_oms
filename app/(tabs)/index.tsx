@@ -138,7 +138,7 @@ export default function HomeScreen() {
               <Button
                 label="Report New Issue"
                 variant="primary"
-                leftIcon={<IconSymbol size={18} name="plus.circle.fill" color="#FFFFFF" />}
+                leftIcon={<IconSymbol size={18} name="plus.circle.fill" color={colorScheme === 'light' ? '#000000' : '#FFFFFF'} />}
                 className="flex-1"
               />
             </Link>
@@ -146,8 +146,8 @@ export default function HomeScreen() {
             <Link href="/(tabs)/issues" asChild>
               <Button
                 label="View All Issues"
-                variant="secondary"
-                leftIcon={<IconSymbol size={18} name="list.bullet" color={colors.tint} />}
+                variant="primary"
+                leftIcon={<IconSymbol size={18} name="list.bullet" color={colorScheme === 'light' ? '#000000' : '#FFFFFF'} />}
                 className="flex-1"
               />
             </Link>

@@ -87,7 +87,7 @@ export function Button({
   
   const getContainerClasses = () => {
     // Base classes for all buttons
-    let classes = 'items-center justify-center';
+    let classes = 'flex items-center justify-center';
     
     // Size classes
     switch (size) {
@@ -107,7 +107,11 @@ export function Button({
     // Variant classes
     switch (variant) {
       case 'primary':
-        classes += ` bg-[${colors.tint}]`;
+        if (colorScheme === 'light') {
+          classes += ' bg-transparent border border-[#777777]';
+        } else {
+          classes += ' bg-transparent border border-[#AAAAAA]';
+        }
         break;
       case 'secondary':
         classes += ` bg-transparent border-2 border-[${colors.tint}]`;
@@ -155,7 +159,7 @@ export function Button({
   const getTextColor = () => {
     switch (variant) {
       case 'primary':
-        return '#FFFFFF';
+        return colorScheme === 'light' ? '#000000' : '#FFFFFF';
       case 'secondary':
         return colors.tint;
       case 'danger':
@@ -184,12 +188,12 @@ export function Button({
           color={variant === 'secondary' || variant === 'ghost' ? colors.tint : '#FFFFFF'}
         />
       ) : (
-        <View className="flex-row items-center justify-center">
-          {leftIcon && <View className="mx-1.5">{leftIcon}</View>}
+        <View className="flex-row items-center justify-center w-full">
+          {leftIcon && <View className="mr-2">{leftIcon}</View>}
           <ThemedText style={[{ color: getTextColor() }, textStyle]} className={getTextClasses()}>
             {label}
           </ThemedText>
-          {rightIcon && <View className="mx-1.5">{rightIcon}</View>}
+          {rightIcon && <View className="ml-2">{rightIcon}</View>}
         </View>
       )}
     </Pressable>
