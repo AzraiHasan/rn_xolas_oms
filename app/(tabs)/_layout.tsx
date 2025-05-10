@@ -74,6 +74,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="plus.circle.fill" color={color} />
         }}
       />
+      <Tabs.Screen
+        name="sync-demo"
+        options={{
+          title: 'Sync',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="arrow.counterclockwise" color={color} />
+        }}
+      />
     </Tabs>
   );
 }
