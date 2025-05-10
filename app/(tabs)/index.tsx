@@ -1,12 +1,13 @@
 import { Image } from 'expo-image';
 import { Link } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IssueBarChart, RecentActivityItem, StatisticCard } from '@/components/dashboard';
+import { AppHeader } from '@/components/layout/AppHeader';
 import { Button } from '@/components/ui/Button';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
@@ -89,7 +90,7 @@ export default function HomeScreen() {
           <StatisticCard
             value={stats.total}
             label="Total Issues"
-            backgroundColor={colorScheme === 'dark' ? '#2A2A2A' : '#F5F5F5'}
+            borderColor={colorScheme === 'dark' ? '#FFFFFF' : '#444444'}
             iconName="tray.fill"
             iconColor={colors.icon}
           />
@@ -97,7 +98,7 @@ export default function HomeScreen() {
           <StatisticCard
             value={stats.bySeverity[IssueSeverity.High]}
             label={IssueSeverity.High}
-            backgroundColor={colorScheme === 'dark' ? '#442626' : '#FDDCDC'}
+            borderColor="#E11D48"
             valueColor="#E11D48"
             labelColor="#E11D48"
             iconName="exclamationmark.triangle.fill"
@@ -107,7 +108,7 @@ export default function HomeScreen() {
           <StatisticCard
             value={stats.bySeverity[IssueSeverity.Medium]}
             label={IssueSeverity.Medium}
-            backgroundColor={colorScheme === 'dark' ? '#453A1F' : '#FFF0C2'}
+            borderColor="#F59E0B"
             valueColor="#F59E0B"
             labelColor="#F59E0B"
             iconName="exclamationmark.circle.fill"
@@ -117,7 +118,7 @@ export default function HomeScreen() {
           <StatisticCard
             value={stats.bySeverity[IssueSeverity.Low]}
             label={IssueSeverity.Low}
-            backgroundColor={colorScheme === 'dark' ? '#1E3A2F' : '#DCFCE7'}
+            borderColor="#10B981"
             valueColor="#10B981"
             labelColor="#10B981"
             iconName="checkmark.circle.fill"
@@ -181,7 +182,7 @@ export default function HomeScreen() {
   
   return (
     <ParallaxScrollView
-    className="md:pb-12"
+    /* className="md:pb-12" */
     headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
       headerImage={
         <Image
@@ -189,9 +190,7 @@ export default function HomeScreen() {
           className="h-[178px] w-[290px] absolute bottom-0 left-0"
         />
       }>
-      <ThemedView className="flex-row items-center gap-2 mb-4">
-        <ThemedText type="title">Issue Dashboard</ThemedText>
-      </ThemedView>
+      <AppHeader title="Issue Dashboard" />
       
       {renderContent()}
     </ParallaxScrollView>

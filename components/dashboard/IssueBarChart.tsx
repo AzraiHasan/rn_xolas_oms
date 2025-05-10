@@ -34,29 +34,20 @@ export function IssueBarChart({ data, total }: IssueBarChartProps) {
       
       <ThemedView className="gap-4 md:gap-5">
         <ThemedView className="h-6 md:h-8 flex-row rounded overflow-hidden bg-slate-100 dark:bg-gray-800">
-          <ThemedView className={`h-full ${
-            highPercentage > 0 
-              ? `w-[${highPercentage}%] bg-[#E11D48] ${
-                  mediumPercentage === 0 && lowPercentage === 0 
-                    ? 'rounded' 
-                    : 'rounded-l'
-                }`
-              : 'w-0'
-          }`} />
+          <ThemedView 
+            className={`h-full bg-[#E11D48] ${highPercentage > 0 ? (mediumPercentage === 0 && lowPercentage === 0 ? 'rounded' : 'rounded-l') : ''}`}
+            style={{ width: `${highPercentage}%` }}
+          />
           
-          <ThemedView className={`h-full ${
-            mediumPercentage > 0 
-              ? `w-[${mediumPercentage}%] bg-[#F59E0B] ${
-                  lowPercentage === 0 ? 'rounded-r' : ''
-                }`
-              : 'w-0'
-          }`} />
+          <ThemedView 
+            className={`h-full bg-[#F59E0B] ${mediumPercentage > 0 ? (lowPercentage === 0 ? 'rounded-r' : '') : ''}`}
+            style={{ width: `${mediumPercentage}%` }}
+          />
           
-          <ThemedView className={`h-full ${
-            lowPercentage > 0 
-              ? `w-[${lowPercentage}%] bg-[#10B981] rounded-r` 
-              : 'w-0'
-          }`} />
+          <ThemedView 
+            className={`h-full bg-[#10B981] ${lowPercentage > 0 ? 'rounded-r' : ''}`}
+            style={{ width: `${lowPercentage}%` }}
+          />
         </ThemedView>
         
         <ThemedView className="flex-row flex-wrap gap-4 md:gap-6">

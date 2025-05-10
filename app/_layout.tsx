@@ -1,33 +1,51 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ColorSchemeName } from 'react-native';
 import 'react-native-reanimated';
 import '../global.css';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   if (!loaded) {
-    // Async font loading only occurs in development.
     return null;
   }
 
   return (
+    <ThemeProvider>
+      <RootLayoutNavigation />
+    </ThemeProvider>
+  );
+}
+
+function RootLayoutNavigation() {
+  // Get colorScheme from context
+  const colorScheme = useColorSchemeHelper();
+  
+  return (
     <SafeAreaProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>
+        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+      </NavigationThemeProvider>
     </SafeAreaProvider>
   );
+}
+
+// Helper function to access theme context
+function useColorSchemeHelper(): NonNullable<ColorSchemeName> {
+  // Import inside the component to avoid circular dependency
+  const { useThemeContext } = require('@/contexts/ThemeContext');
+  const { colorScheme } = useThemeContext();
+  return colorScheme;
 }

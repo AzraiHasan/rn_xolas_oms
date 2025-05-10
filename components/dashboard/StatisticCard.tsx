@@ -9,6 +9,7 @@ interface StatisticCardProps {
   value: number | string;
   label: string;
   backgroundColor?: string;
+  borderColor?: string;
   valueColor?: string;
   labelColor?: string;
   iconName?: string;
@@ -23,7 +24,8 @@ interface StatisticCardProps {
 export function StatisticCard({
   value,
   label,
-  backgroundColor = '#F5F5F5',
+  backgroundColor = 'transparent',
+  borderColor = '#E5E5E5',
   valueColor,
   labelColor,
   iconName,
@@ -33,8 +35,8 @@ export function StatisticCard({
 }: StatisticCardProps) {
   return (
     <ThemedView 
-      className={`flex-1 min-w-[45%] md:min-w-[30%] lg:min-w-0 rounded-xl p-4 md:p-5 min-h-[100px] md:min-h-[120px] flex-row justify-between ${className || ''}`}
-      style={[{ backgroundColor }, style]}
+      className={`flex-1 min-w-[45%] md:min-w-[30%] lg:min-w-0 rounded-xl p-4 md:p-5 min-h-[100px] md:min-h-[120px] flex-row justify-between border ${className || ''}`}
+      style={[{ backgroundColor, borderColor, borderWidth: 1 }, style]}
     >
       <ThemedView className="justify-center">
         <ThemedText 
@@ -54,7 +56,7 @@ export function StatisticCard({
       
       {iconName && (
         <ThemedView className="justify-center opacity-80">
-          <IconSymbol name={iconName} size={28} color={iconColor} />
+          <IconSymbol name={iconName} size={28} color={iconColor || '#000000'} />
         </ThemedView>
       )}
     </ThemedView>

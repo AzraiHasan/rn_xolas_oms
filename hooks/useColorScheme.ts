@@ -1,7 +1,7 @@
-// Override the default useColorScheme hook to always return 'light'
 import { ColorSchemeName } from 'react-native';
+import { useThemeContext } from '@/contexts/ThemeContext';
 
 export function useColorScheme(): NonNullable<ColorSchemeName> {
-  // Always return 'light' regardless of system settings
-  return 'light';
+  const { colorScheme } = useThemeContext();
+  return colorScheme;
 }
