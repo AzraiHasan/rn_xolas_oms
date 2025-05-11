@@ -186,7 +186,7 @@ export default function HomeScreen() {
             borderColor="#8B5CF6"
             valueColor="#8B5CF6"
             labelColor="#8B5CF6"
-            iconName="person.crop.circle.fill"
+            iconName="account-circle"
             iconColor="#8B5CF6"
             navigateToFilter={{
               type: 'status',
@@ -200,7 +200,7 @@ export default function HomeScreen() {
             borderColor="#F97316"
             valueColor="#F97316"
             labelColor="#F97316"
-            iconName="arrow.triangle.2.circlepath"
+            iconName="sync"
             iconColor="#F97316"
             navigateToFilter={{
               type: 'status',
@@ -214,7 +214,7 @@ export default function HomeScreen() {
             borderColor="#10B981"
             valueColor="#10B981"
             labelColor="#10B981"
-            iconName="checkmark.seal.fill"
+            iconName="check-decagram"
             iconColor="#10B981"
             navigateToFilter={{
               type: 'status',
@@ -226,31 +226,6 @@ export default function HomeScreen() {
         {/* Issue Chart */}
         <ThemedText type="subtitle" className="mb-3">Issue Visualization</ThemedText>
         <IssueBarChart data={stats.bySeverity} total={stats.total} />
-        
-        {/* Quick Actions */}
-        <ThemedView className="mb-6">
-          <ThemedText type="subtitle">Quick Actions</ThemedText>
-          
-          <ThemedView className="flex-row mt-3 gap-3 md:gap-4">
-            <Link href="/(tabs)/create-issue" asChild>
-              <Button
-                label="Report New Issue"
-                variant="primary"
-                leftIcon={<IconSymbol size={18} name="plus.circle.fill" color={colorScheme === 'light' ? '#000000' : '#FFFFFF'} />}
-                className="flex-1"
-              />
-            </Link>
-            
-            <Link href="/(tabs)/issues" asChild>
-              <Button
-                label="View All Issues"
-                variant="primary"
-                leftIcon={<IconSymbol size={18} name="list.bullet" color={colorScheme === 'light' ? '#000000' : '#FFFFFF'} />}
-                className="flex-1"
-              />
-            </Link>
-          </ThemedView>
-        </ThemedView>
         
         {/* Recent Activity */}
         <ThemedView className="mb-6">

@@ -83,7 +83,7 @@ export function IssueCard({ issue, style, onPress }: IssueCardProps) {
           </ThemedView>
           
           <ThemedView className="flex-row items-center mr-3 mb-1">
-            <IconSymbol size={14} name="event" color={colors.icon} />
+            <IconSymbol size={14} name="calendar-month" color={colors.icon} />
             <ThemedText className="text-xs ml-1">{formattedDate}</ThemedText>
           </ThemedView>
         </ThemedView>

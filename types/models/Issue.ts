@@ -27,6 +27,21 @@ export interface Photo {
   title?: string;
 }
 
+export interface IssueUpdate {
+  /** Timestamp when the update was made */
+  timestamp: string;
+  /** Description of the update */
+  description: string;
+  /** Photos added with this update */
+  photos: Photo[];
+  /** Previous status before update */
+  previousStatus?: IssueStatus;
+  /** Updated status */
+  newStatus: IssueStatus;
+  /** Technician who made the update (future enhancement) */
+  technician?: string;
+}
+
 export interface IssueReport {
   /** Unique identifier for the issue report */
   id: string;
@@ -44,6 +59,8 @@ export interface IssueReport {
   status: IssueStatus;
   /** Collection of photos documenting the issue */
   photos: Photo[];
+  /** History of updates to this issue */
+  updates?: IssueUpdate[];
 }
 
 /**

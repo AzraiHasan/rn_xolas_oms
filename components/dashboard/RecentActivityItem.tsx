@@ -70,9 +70,9 @@ export function RecentActivityItem({ issue }: RecentActivityItemProps) {
   return (
     <Link href={{ pathname: '/issue/[id]', params: { id: issue.id } }} asChild>
       <TouchableOpacity activeOpacity={0.7}>
-        <ThemedView className="flex-row items-center py-3 px-1 md:py-4 md:px-3 border-b border-[#E4E7EB] dark:border-gray-700">
+        <ThemedView className="flex-row py-3 px-4 md:py-4 md:px-5 border-b border-[#E4E7EB] dark:border-gray-700">
           <ThemedView 
-            className="w-9 h-9 md:w-12 md:h-12 rounded-full items-center justify-center mr-3"
+            className="w-9 h-9 md:w-12 md:h-12 rounded-full items-center justify-center mr-3 mt-0"
             style={{ backgroundColor: `${getSeverityColor()}20` }}
           >
             <IconSymbol 
@@ -84,29 +84,40 @@ export function RecentActivityItem({ issue }: RecentActivityItemProps) {
           </ThemedView>
           
           <ThemedView className="flex-1 mr-3">
-            <ThemedText 
-              type="defaultSemiBold" 
-              numberOfLines={1} 
-              className="text-[15px] md:text-base mb-1"
-            >
-              {issue.title}
-            </ThemedText>
-            
-            <ThemedView className="flex-row items-center justify-between">
-              <ThemedView className="flex-row items-center flex-1">
-                <IconSymbol name="mappin.circle.fill" size={12} color={colors.icon} />
-                <ThemedText 
-                  numberOfLines={1}
-                  className="text-xs md:text-sm ml-1 text-[#687076] dark:text-gray-400"
-                >
-                  {issue.location}
-                </ThemedText>
-              </ThemedView>
-              
-              <ThemedText className="text-xs md:text-sm text-[#687076] dark:text-gray-400">
-                {getRelativeTime(issue.timestamp)}
-              </ThemedText>
-            </ThemedView>
+          <ThemedText 
+          type="defaultSemiBold" 
+          numberOfLines={1} 
+          className="text-[15px] md:text-base mb-1"
+          >
+          {issue.title}
+          </ThemedText>
+          
+          <ThemedView className="mb-1">
+          <ThemedView className="flex-row items-center">
+          <IconSymbol name="mappin.circle.fill" size={12} color={colors.icon} />
+          <ThemedText 
+          numberOfLines={1}
+          className="text-xs md:text-sm ml-1 text-[#687076] dark:text-gray-400"
+          >
+          {issue.location}
+          </ThemedText>
+          </ThemedView>
+          
+          <ThemedView className="flex-row items-center mt-1">
+          <IconSymbol name="chart-bar" size={12} color={colors.icon} />
+          <ThemedText className="text-xs md:text-sm ml-1 text-[#687076] dark:text-gray-400">
+          {/* Show status history if exists, otherwise just current status */}
+          {issue.updates && issue.updates.length > 0 ? 
+          `${issue.updates[issue.updates.length - 1].previousStatus} → ${issue.status}` : 
+          issue.status
+          }
+          </ThemedText>
+          </ThemedView>
+          </ThemedView>
+          
+          <ThemedText className="text-xs md:text-sm text-right text-[#687076] dark:text-gray-400 pt-2">
+          {getRelativeTime(issue.timestamp)}
+          </ThemedText>
           </ThemedView>
           
           {issue.photos.length > 0 && (

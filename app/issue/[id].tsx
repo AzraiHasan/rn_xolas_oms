@@ -257,6 +257,11 @@ export default function IssueDetailScreen() {
             <ThemedText style={styles.metaText}>{formatTimestamp(issue.timestamp)}</ThemedText>
           </ThemedView>
           
+          <ThemedView style={styles.metaItem}>
+            <IconSymbol size={16} name="chart-bar" color={colors.icon} />
+            <ThemedText style={styles.metaText}>{issue.status}</ThemedText>
+          </ThemedView>
+          
           <ThemedView style={[
             styles.severityBadge, 
             { backgroundColor: getSeverityColor(issue.severity) }
@@ -279,6 +284,48 @@ export default function IssueDetailScreen() {
             onPhotoRemove={handleRemovePhoto}
           />
         </ThemedView>
+
+        {/* Update History Section */}
+        {issue.updates && issue.updates.length > 0 && (
+          <ThemedView style={styles.sectionContainer}>
+            <ThemedText type="subtitle">Update History</ThemedText>
+            {issue.updates.map((update, index) => (
+              <ThemedView key={index} style={styles.updateContainer}>
+                <ThemedView style={styles.updateHeader}>
+                  <ThemedText style={styles.updateTimestamp}>
+                    {formatTimestamp(update.timestamp)}
+                  </ThemedText>
+                  <ThemedView style={styles.statusChangeContainer}>
+                    <ThemedText style={styles.statusText}>
+                      {update.previousStatus} → {update.newStatus}
+                    </ThemedText>
+                  </ThemedView>
+                </ThemedView>
+                
+                <ThemedText style={styles.updateDescription}>
+                  {update.description}
+                </ThemedText>
+                
+                {update.photos.length > 0 && (
+                  <ThemedView style={styles.updatePhotosContainer}>
+                    <ThemedText style={styles.photosSectionTitle}>Photos Added:</ThemedText>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.photoScroll}>
+                      {update.photos.map((photo) => (
+                        <ThemedView key={photo.id} style={styles.photoThumbnailContainer}>
+                          <Image
+                            source={{ uri: photo.uri }}
+                            style={styles.photoThumbnail}
+                            contentFit="cover"
+                          />
+                        </ThemedView>
+                      ))}
+                    </ScrollView>
+                  </ThemedView>
+                )}
+              </ThemedView>
+            ))}
+          </ThemedView>
+        )}
       </ScrollView>
       
       {/* Action Buttons - Fixed at bottom */}
@@ -290,12 +337,15 @@ export default function IssueDetailScreen() {
             borderColor: '#2563EB'
           }}
           onPress={() => {
-            Alert.alert('Coming Soon', 'Edit functionality will be implemented in a future sprint.');
+            router.navigate({
+              pathname: '/issue/update/[id]', 
+              params: { id: issue.id }
+            });
           }}
         >
           <ThemedView className="flex-row items-center justify-center">
             <IconSymbol size={20} name="pencil" color="#2563EB" />
-            <ThemedText className="font-medium md:text-base ml-2" style={{ color: '#2563EB' }}>Edit</ThemedText>
+            <ThemedText className="font-medium md:text-base ml-2" style={{ color: '#2563EB' }}>Update</ThemedText>
           </ThemedView>
         </Pressable>
         
@@ -318,6 +368,9 @@ export default function IssueDetailScreen() {
     </SafeAreaView>
   );
 }
+
+// Add necessary imports
+import { Image } from 'expo-image';
 
 const styles = StyleSheet.create({
   container: {
@@ -421,5 +474,57 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginVertical: 16,
+  },
+  updateContainer: {
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: '#E4E7EB',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 8,
+  },
+  updateHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  updateTimestamp: {
+    fontSize: 12,
+    opacity: 0.7,
+  },
+  statusChangeContainer: {
+    backgroundColor: '#F3F4F6',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  updateDescription: {
+    fontSize: 14,
+    marginBottom: 12,
+  },
+  updatePhotosContainer: {
+    marginTop: 8,
+  },
+  photosSectionTitle: {
+    fontSize: 12,
+    marginBottom: 8,
+    fontWeight: '500',
+  },
+  photoScroll: {
+    flexDirection: 'row',
+    marginBottom: 8,
+  },
+  photoThumbnailContainer: {
+    marginRight: 8,
+  },
+  photoThumbnail: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
   },
 });

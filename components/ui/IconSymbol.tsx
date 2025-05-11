@@ -28,6 +28,16 @@ const MATERIAL_ICON_MAPPING: Record<string, string> = {
   'pencil': 'pencil',
   'trash.fill': 'delete',
   'square.and.arrow.up': 'share',
+  // Additional mappings for problematic icons
+  'person.crop.circle.fill': 'account-circle',
+  'arrow.triangle.2.circlepath': 'sync',
+  'checkmark.seal.fill': 'check-decagram',
+  'person.crop.circle': 'account',
+  'checkmark.seal': 'check-decagram-outline',
+  'line.3.horizontal.decrease.circle': 'filter-variant',
+  'event': 'calendar-month',
+  'arrow.counterclockwise': 'refresh',
+  'chart.bar': 'chart-bar'
 };
 
 // Get safe icon name for Material Icons

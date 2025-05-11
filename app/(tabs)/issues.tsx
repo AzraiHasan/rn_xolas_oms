@@ -161,9 +161,9 @@ export default function IssuesScreen() {
           onPress={resetFilters}
         >
           <IconSymbol 
-            name="arrow.counterclockwise" 
-            size={16} 
-            color={colorScheme === 'dark' ? '#FFFFFF' : '#000000'} 
+          name="refresh" 
+          size={16} 
+          color={colorScheme === 'dark' ? '#FFFFFF' : '#000000'} 
           />
           <ThemedText className="ml-2">Reset Filters</ThemedText>
         </Pressable>
@@ -195,7 +195,7 @@ export default function IssuesScreen() {
           onPress={toggleFilters}
         >
           <IconSymbol 
-            name="line.3.horizontal.decrease.circle" 
+            name="filter-variant" 
             size={20} 
             color={colorScheme === 'dark' ? '#FFFFFF' : '#000000'} 
           />
@@ -273,7 +273,7 @@ export default function IssuesScreen() {
               onPress={resetFilters}
             >
               <IconSymbol 
-                name="arrow.counterclockwise" 
+                name="refresh" 
                 size={16} 
                 color={colorScheme === 'dark' ? '#FFFFFF' : '#000000'} 
               />
