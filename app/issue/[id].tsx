@@ -257,16 +257,18 @@ export default function IssueDetailScreen() {
             <ThemedText style={styles.metaText}>{formatTimestamp(issue.timestamp)}</ThemedText>
           </ThemedView>
           
-          <ThemedView style={styles.metaItem}>
-            <IconSymbol size={16} name="chart-bar" color={colors.icon} />
-            <ThemedText style={styles.metaText}>{issue.status}</ThemedText>
-          </ThemedView>
+          <ThemedView className="mr-4"></ThemedView>
           
           <ThemedView style={[
             styles.severityBadge, 
             { backgroundColor: getSeverityColor(issue.severity) }
           ]}>
             <ThemedText style={styles.severityText}>{issue.severity}</ThemedText>
+          </ThemedView>
+          
+          <ThemedView style={styles.metaItem}>
+            <IconSymbol size={16} name="chart-bar" color={colors.icon} />
+            <ThemedText style={styles.metaText}>{issue.status}</ThemedText>
           </ThemedView>
         </ThemedView>
         
