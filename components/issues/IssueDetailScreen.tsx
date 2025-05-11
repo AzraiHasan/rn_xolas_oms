@@ -219,74 +219,12 @@ export function IssueDetailScreen({ issueId }: IssueDetailScreenProps) {
           <ThemedText style={styles.description}>{issue.description}</ThemedText>
         </ThemedView>
         
-        {/* Photos Section with Native Button */}
+        {/* Photos Section with PhotoGallery Component */}
         <ThemedView style={{marginBottom: 24}}>
-          <ThemedText type="subtitle">Photos ({issue.photos.length})</ThemedText>
-          
-          {issue.photos.length === 0 ? (
-            <ThemedView className="items-center justify-center p-8 border border-[#E4E7EB] dark:border-gray-700 border-dashed rounded-lg mt-4">
-              <IconSymbol name="photo.fill" size={32} color={colors.icon} />
-              <ThemedText className="mt-2 text-[#687076] dark:text-gray-400">No photos available</ThemedText>
-            </ThemedView>
-          ) : (
-            <ScrollView horizontal={true} style={{marginTop: 12}}>
-              {issue.photos.map(photo => (
-                <View key={photo.id} style={{width: 200, height: 250, marginRight: 12}}>
-                  <Image
-                    source={{ uri: photo.uri }}
-                    style={{width: 200, height: 200, borderRadius: 8}}
-                    contentFit="cover"
-                  />
-                  <View style={{marginTop: 8}}>
-                    <NativeButton
-                      title="DELETE PHOTO"
-                      color="#E11D48"
-                      onPress={() => {
-                        console.log('Native button pressed for photo:', photo.id);
-                        Alert.alert(
-                          'Delete Photo',
-                          'Are you sure you want to delete this photo?',
-                          [
-                            { text: 'Cancel', style: 'cancel' },
-                            { 
-                              text: 'Delete', 
-                              style: 'destructive',
-                              onPress: () => {
-                                console.log('Delete confirmed for photo:', photo.id);
-                                removePhotoFromIssue(issue.id, photo.id)
-                                  .then(updatedIssue => {
-                                    if (updatedIssue) {
-                                      console.log('Photo deleted successfully');
-                                      setIssue(updatedIssue);
-                                    }
-                                  })
-                                  .catch(err => {
-                                    console.error('Error deleting photo:', err);
-                                    Alert.alert('Error', 'Failed to delete photo');
-                                  });
-                              }
-                            }
-                          ]
-                        );
-                      }}
-                    />
-                  </View>
-                </View>
-              ))}
-            </ScrollView>
-          )}
-          
-          {/* Test Button */}
-          <View style={{marginTop: 16}}>
-            <NativeButton 
-              title="TEST BUTTON - PRESS ME" 
-              onPress={() => {
-                console.log('TEST BUTTON PRESSED!');
-                Alert.alert('Test', 'Test button was pressed successfully!');
-              }}
-              color="#000000"
-            />
-          </View>
+          <PhotoGallery 
+            photos={issue.photos} 
+            title="Photos"
+          />
         </ThemedView>
         
       </ScrollView>

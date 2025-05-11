@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { FlatList, ActivityIndicator, RefreshControl, View, Pressable } from 'react-native';
+import React, { useState, useCallback, useMemo, useEffect, useContext } from 'react';
+import { FlatList, ActivityIndicator, RefreshControl, View, Pressable, Text } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 
 import { ThemedView } from '@/components/ThemedView';
@@ -10,6 +10,7 @@ import { useIssues } from '@/contexts/IssueContext';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { IssueSeverity, IssueStatus, IssueReport } from '@/types/models/Issue';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { useThemeContext } from '@/contexts/ThemeContext';
 
 
 
@@ -22,6 +23,7 @@ type FilterState = {
 export default function IssuesScreen() {
   const { issues, loading, error, refreshIssues } = useIssues();
   const colorScheme = useColorScheme();
+  const { toggleColorScheme } = useThemeContext();
   const searchParams = useLocalSearchParams();
   
   // Parse filter params from URL if present
@@ -154,9 +156,10 @@ export default function IssuesScreen() {
       
       {(filters.severity || filters.status) && (
         <Pressable
-          className="mt-4 py-2 px-4 rounded-lg flex-row items-center"
+          className="mt-4 py-2 px-4 rounded-lg flex-row items-center border"
           style={{
-            backgroundColor: colorScheme === 'dark' ? '#374151' : '#E5E7EB',
+            backgroundColor: 'transparent',
+            borderColor: colorScheme === 'dark' ? '#6B7280' : '#9CA3AF',
           }}
           onPress={resetFilters}
         >
@@ -178,6 +181,29 @@ export default function IssuesScreen() {
       <Stack.Screen options={{ 
         headerShown: false,
       }} />
+      
+      {/* Theme Toggle Button */}
+      <ThemedView style={{flexDirection: 'row', justifyContent: 'flex-end', paddingHorizontal: 16, paddingTop: 8}}>
+        <Pressable
+          style={{
+            backgroundColor: colorScheme === 'dark' ? '#444' : '#ddd',
+            padding: 8,
+            borderRadius: 8,
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+          onPress={toggleColorScheme}
+        >
+          <IconSymbol 
+            name={colorScheme === 'dark' ? 'white-balance-sunny' : 'moon-waning-crescent'} 
+            size={20} 
+            color={colorScheme === 'dark' ? '#fff' : '#000'}
+          />
+          <ThemedText style={{marginLeft: 8, fontWeight: '500'}}>
+            {colorScheme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          </ThemedText>
+        </Pressable>
+      </ThemedView>
       
       {/* Filter bar */}
       <ThemedView className="px-4 py-2 flex-row justify-between items-center border-b border-gray-200 dark:border-gray-800">
@@ -266,9 +292,10 @@ export default function IssuesScreen() {
           
           {(filters.severity || filters.status) && (
             <Pressable
-              className="mt-2 py-2 px-4 self-start rounded-lg flex-row items-center"
+              className="mt-2 py-2 px-4 self-start rounded-lg flex-row items-center border"  
               style={{
-                backgroundColor: colorScheme === 'dark' ? '#374151' : '#E5E7EB',
+                backgroundColor: 'transparent',
+                borderColor: colorScheme === 'dark' ? '#6B7280' : '#9CA3AF',
               }}
               onPress={resetFilters}
             >

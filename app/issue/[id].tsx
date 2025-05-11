@@ -2,7 +2,8 @@ import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Alert, Pressable } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Image } from 'expo-image';
 
 import { PhotoGallery } from '@/components/photos';
 import { ThemedText } from '@/components/ThemedText';
@@ -10,6 +11,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { useThemeContext } from '@/contexts/ThemeContext';
 import { useIssues } from '@/contexts/IssueContext';
 import { IssueReport, IssueSeverity } from '@/types/models/Issue';
 
@@ -20,8 +22,10 @@ export default function IssueDetailScreen() {
   const { id } = useLocalSearchParams();
   const issueId = typeof id === 'string' ? id : '';
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   
   const colorScheme = useColorScheme();
+  const { toggleColorScheme } = useThemeContext();
   const colors = Colors[colorScheme ?? 'light'];
   
   const { 
@@ -44,19 +48,26 @@ export default function IssueDetailScreen() {
     }
     
     try {
+      console.log('Fetching issue with ID:', issueId);
+      console.log('Current colorScheme:', colorScheme);
       const issueData = getIssueById(issueId);
+      console.log('Issue data found:', issueData ? 'YES' : 'NO');
+      if (issueData) {
+        console.log('Issue updates:', issueData.updates);
+        console.log('Dark update container style:', styles.dark_updateContainer);
+      }
       setIssue(issueData || null);
       
       if (!issueData) {
         setError('Issue not found');
       }
     } catch (err) {
-      console.error(err);
+      console.error('Error fetching issue:', err);
       setError('Failed to load issue details');
     } finally {
       setLoading(false);
     }
-  }, [issueId, getIssueById]);
+  }, [issueId, getIssueById, colorScheme]);
   
   // Format timestamp to a readable date
   const formatTimestamp = (timestamp: string): string => {
@@ -181,23 +192,34 @@ export default function IssueDetailScreen() {
     );
   };
   
+  const darkContainerStyle = colorScheme === 'dark' ? {
+    borderColor: '#3E4144',
+    backgroundColor: 'rgba(30, 31, 32, 0.5)',
+  } : {};
+  
+  const darkStatusStyle = colorScheme === 'dark' ? {
+    backgroundColor: '#2D3033',
+  } : {};
+  
   // Render content based on state
   if (loading || issuesLoading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar style="light" />
+      <ThemedView style={styles.container}>
+        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+        <ThemedView style={[styles.statusBarBackground, { height: insets.top }]} />
         <ThemedView style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.tint} />
           <ThemedText style={styles.loadingText}>Loading issue details...</ThemedText>
         </ThemedView>
-      </SafeAreaView>
+      </ThemedView>
     );
   }
   
   if (error || !issue) {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar style="light" />
+      <ThemedView style={styles.container}>
+        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+        <ThemedView style={[styles.statusBarBackground, { height: insets.top }]} />
         <ThemedView style={styles.errorContainer}>
           <IconSymbol 
             size={48} 
@@ -220,13 +242,50 @@ export default function IssueDetailScreen() {
             </Pressable>
           </Link>
         </ThemedView>
-      </SafeAreaView>
+      </ThemedView>
     );
   }
   
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="light" />
+    <ThemedView style={styles.container}>
+      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+      
+      {/* Status Bar Background */}
+      <ThemedView style={[styles.statusBarBackground, { height: insets.top }]} />
+      
+      {/* Custom Header */}
+      <ThemedView style={styles.headerContainer}>
+        <Pressable 
+          onPress={() => router.back()} 
+          style={[styles.backButton, { 
+            backgroundColor: colorScheme === 'dark' ? colors.dark[700] : '#FFFFFF',
+            borderWidth: 1,
+            borderColor: colorScheme === 'dark' ? colors.dark[500] : '#666666'
+          }]}
+        >
+          <IconSymbol name="chevron.left" size={24} color={colors.text} />
+        </Pressable>
+        <ThemedText type="title" style={styles.headerTitle}>Issue Details</ThemedText>
+        
+        {/* Add theme toggle button */}
+        <Pressable
+          style={{
+            backgroundColor: colorScheme === 'dark' ? '#444' : '#ddd',
+            width: 36,
+            height: 36,
+            borderRadius: 18,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onPress={toggleColorScheme}
+        >
+          <IconSymbol 
+            name={colorScheme === 'dark' ? 'white-balance-sunny' : 'moon-waning-crescent'} 
+            size={20} 
+            color={colorScheme === 'dark' ? '#fff' : '#000'}
+          />
+        </Pressable>
+      </ThemedView>
       
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Issue Header */}
@@ -279,7 +338,7 @@ export default function IssueDetailScreen() {
         </ThemedView>
         
         {/* Photos Section */}
-        <ThemedView style={styles.sectionContainer}>
+        <ThemedView style={[styles.sectionContainer, { marginBottom: 12 }]}>
           <PhotoGallery 
             photos={issue.photos} 
             title="Photos" 
@@ -289,43 +348,71 @@ export default function IssueDetailScreen() {
 
         {/* Update History Section */}
         {issue.updates && issue.updates.length > 0 && (
-          <ThemedView style={styles.sectionContainer}>
+          <ThemedView style={[styles.sectionContainer, { marginTop: 0 }]}>
             <ThemedText type="subtitle">Update History</ThemedText>
-            {issue.updates.map((update, index) => (
-              <ThemedView key={index} style={styles.updateContainer}>
-                <ThemedView style={styles.updateHeader}>
+            {console.log('Rendering updates, count:', issue.updates.length)}
+            {console.log('colorScheme in render:', colorScheme)}
+            {issue.updates.map((update, index) => {
+              console.log('Rendering update:', index, typeof update);
+              
+              // Skip if update is not a valid object
+              if (!update || typeof update !== 'object') {
+                console.log('Update is null, undefined, or not an object');
+                return null;
+              }
+              
+              // Make sure timestamp exists
+              const timestamp = update.timestamp || new Date().toISOString();
+              const description = update.description || 'No description';
+              const previousStatus = update.previousStatus || 'Unknown';
+              const newStatus = update.newStatus || 'Unknown';
+              
+              // Use empty array if photos is undefined
+              const photosArray = update.photos && Array.isArray(update.photos) ? update.photos : [];
+              console.log('Photos array length:', photosArray.length);
+              
+              return (
+                <ThemedView key={index} style={[styles.updateContainer, darkContainerStyle]}>
                   <ThemedText style={styles.updateTimestamp}>
-                    {formatTimestamp(update.timestamp)}
+                    {formatTimestamp(timestamp)}
                   </ThemedText>
-                  <ThemedView style={styles.statusChangeContainer}>
+                  <ThemedView style={[styles.statusChangeContainer, darkStatusStyle]}>
                     <ThemedText style={styles.statusText}>
-                      {update.previousStatus} → {update.newStatus}
+                      {previousStatus} → {newStatus}
                     </ThemedText>
                   </ThemedView>
+                  
+                  <ThemedText style={styles.updateDescription}>
+                    {description}
+                  </ThemedText>
+                  
+                  {update.photos && Array.isArray(update.photos) && update.photos.length > 0 && (
+                    <ThemedView style={styles.updatePhotosContainer}>
+                      <ThemedText style={styles.photosSectionTitle}>Photos Added:</ThemedText>
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.photoScroll}>
+                        {console.log('Photos data structure:', JSON.stringify(update.photos))}
+                        {update.photos.map((photo, photoIndex) => {
+                          console.log('Processing photo:', photo);
+                          if (!photo || !photo.id || !photo.uri) {
+                            console.log('Invalid photo data at index', photoIndex);
+                            return null;
+                          }
+                          return (
+                            <ThemedView key={photo.id} style={styles.photoThumbnailContainer}>
+                              <Image
+                                source={{ uri: photo.uri }}
+                                style={styles.photoThumbnail}
+                                contentFit="cover"
+                              />
+                            </ThemedView>
+                          );
+                        })}
+                      </ScrollView>
+                    </ThemedView>
+                  )}
                 </ThemedView>
-                
-                <ThemedText style={styles.updateDescription}>
-                  {update.description}
-                </ThemedText>
-                
-                {update.photos.length > 0 && (
-                  <ThemedView style={styles.updatePhotosContainer}>
-                    <ThemedText style={styles.photosSectionTitle}>Photos Added:</ThemedText>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.photoScroll}>
-                      {update.photos.map((photo) => (
-                        <ThemedView key={photo.id} style={styles.photoThumbnailContainer}>
-                          <Image
-                            source={{ uri: photo.uri }}
-                            style={styles.photoThumbnail}
-                            contentFit="cover"
-                          />
-                        </ThemedView>
-                      ))}
-                    </ScrollView>
-                  </ThemedView>
-                )}
-              </ThemedView>
-            ))}
+              );
+            })}
           </ThemedView>
         )}
       </ScrollView>
@@ -367,16 +454,44 @@ export default function IssueDetailScreen() {
           </ThemedView>
         </Pressable>
       </ThemedView>
-    </SafeAreaView>
+    </ThemedView>
   );
 }
 
-// Add necessary imports
-import { Image } from 'expo-image';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  statusBarBackground: {
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+    borderBottomColor: '#EEEEEE',
+    borderBottomWidth: 0,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEEEEE',
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    marginRight: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitle: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 18,
+  },
+  headerRight: {
+    width: 24, // To balance the layout
   },
   scrollView: {
     flex: 1,
@@ -384,6 +499,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     paddingBottom: 80, // Add extra padding for fixed buttons
+    paddingTop: 0, // Reduced top padding since we have the header
   },
   issueHeader: {
     flexDirection: 'row',
@@ -485,6 +601,10 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 8,
   },
+  dark_updateContainer: {
+    borderColor: '#3E4144',
+    backgroundColor: 'rgba(30, 31, 32, 0.5)',
+  },
   updateHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -494,12 +614,18 @@ const styles = StyleSheet.create({
   updateTimestamp: {
     fontSize: 12,
     opacity: 0.7,
+    marginBottom: 8,
   },
   statusChangeContainer: {
     backgroundColor: '#F3F4F6',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+  },
+  dark_statusChangeContainer: {
+    backgroundColor: '#2D3033',
   },
   statusText: {
     fontSize: 12,

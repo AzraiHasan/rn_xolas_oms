@@ -180,76 +180,65 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
         </View>
       )}
       
-      {/* Photo Grid */}
-      {photos.length > 0 ? (
-        <FlatList
-          data={photos}
-          keyExtractor={(item) => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item, index }) => (
-            <Pressable 
-              className="w-[120px] h-[120px] md:w-[150px] md:h-[150px] rounded-lg mr-2 overflow-hidden relative" 
-              onPress={() => viewPhoto(index)}
-            >
-              <Image source={{ uri: item.uri }} className="w-full h-full" />
-              <Pressable
-                className="absolute top-1 right-1 z-10 bg-black/30 rounded-full"
-                onPress={() => removePhoto(item.id)}
-              >
-                <Ionicons name="close-circle" size={24} color="#E11D48" />
-              </Pressable>
-            </Pressable>
-          )}
-          ListFooterComponent={
-            photos.length < maxPhotos ? (
-              <View className="flex-row justify-center items-center gap-4">
-                <Pressable
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-lg items-center justify-center"
-                  style={{ backgroundColor: colors.primary }}
-                  onPress={takePhoto}
+      {/* Photo Grid and Camera/Gallery Buttons */}
+      <ThemedView className="">
+        {photos.length > 0 ? (
+          <ThemedView>
+            <FlatList
+              data={photos}
+              keyExtractor={(item) => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item, index }) => (
+                <Pressable 
+                  className="w-[120px] h-[120px] md:w-[150px] md:h-[150px] rounded-lg mr-2 mb-3 overflow-hidden relative" 
+                  onPress={() => viewPhoto(index)}
                 >
-                  <Ionicons name="camera" size={24} color="white" />
+                  <Image source={{ uri: item.uri }} className="w-full h-full" />
+                  <Pressable
+                    className="absolute top-1 right-1 z-10 bg-black/30 rounded-full"
+                    onPress={() => removePhoto(item.id)}
+                  >
+                    <Ionicons name="close-circle" size={24} color="#E11D48" />
+                  </Pressable>
                 </Pressable>
-                <Pressable
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-lg items-center justify-center"
-                  style={{ backgroundColor: colors.primary }}
-                  onPress={pickImage}
-                >
-                  <Ionicons name="images" size={24} color="white" />
-                </Pressable>
-              </View>
-            ) : null
-          }
-        />
-      ) : (
-        <ThemedView 
-          className="h-[150px] md:h-[180px] rounded-lg border border-dashed items-center justify-center p-4"
-          style={{ borderColor: colorScheme === 'dark' ? '#3E4144' : '#9CA3AF' }}
+              )}
+            />
+          </ThemedView>
+        ) : null}
+        
+        {/* Camera and Gallery buttons - always at bottom */}
+        <ThemedView className={`${photos.length === 0 ? 'h-[150px] md:h-[180px] rounded-lg border border-dashed' : ''} flex-row justify-center items-center`}
+          style={{ borderColor: photos.length === 0 ? (colorScheme === 'dark' ? '#3E4144' : '#9CA3AF') : 'transparent' }}
         >
-          <View className="flex-row justify-center items-center gap-4">
-            <Pressable
-              className="w-20 h-20 md:w-24 md:h-24 rounded-lg items-center justify-center"
-              style={{ backgroundColor: colors.primary }}
-              onPress={takePhoto}
-            >
-              <Ionicons name="camera" size={24} color="white" />
-              <ThemedText className="text-white mt-1 text-xs">Camera</ThemedText>
-            </Pressable>
-            <Pressable
-              className="w-20 h-20 md:w-24 md:h-24 rounded-lg items-center justify-center"
-              style={{ backgroundColor: colors.primary }}
-              onPress={pickImage}
-            >
-              <Ionicons name="images" size={24} color="white" />
-              <ThemedText className="text-white mt-1 text-xs">Gallery</ThemedText>
-            </Pressable>
-          </View>
-          <ThemedText className="opacity-50 mt-2 text-center">
-            Take or select up to {maxPhotos} photos
-          </ThemedText>
+          {photos.length < maxPhotos && (
+            <ThemedView className="flex-row justify-center items-center gap-4">
+              <Pressable
+                className="w-20 h-20 md:w-24 md:h-24 rounded-lg items-center justify-center"
+                style={{ backgroundColor: colors.primary }}
+                onPress={takePhoto}
+              >
+                <Ionicons name="camera" size={24} color="white" />
+                <ThemedText className="text-white mt-1 text-xs">Camera</ThemedText>
+              </Pressable>
+              <Pressable
+                className="w-20 h-20 md:w-24 md:h-24 rounded-lg items-center justify-center"
+                style={{ backgroundColor: colors.primary }}
+                onPress={pickImage}
+              >
+                <Ionicons name="images" size={24} color="white" />
+                <ThemedText className="text-white mt-1 text-xs">Gallery</ThemedText>
+              </Pressable>
+            </ThemedView>
+          )}
+          
+          {photos.length === 0 && (
+            <ThemedText className="opacity-50 absolute bottom-2 text-center">
+              Take or select up to {maxPhotos} photos
+            </ThemedText>
+          )}
         </ThemedView>
-      )}
+      </ThemedView>
       
       {/* Photo Modal for full-screen preview */}
       <Modal

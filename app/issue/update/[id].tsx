@@ -55,7 +55,8 @@ export default function UpdateIssueScreen() {
       } else {
         setIssue(issueData);
         setStatus(issueData.status);
-        setPhotos([...issueData.photos]);
+        // Initialize with empty array for new photos only
+        setPhotos([]);
       }
     } catch (err) {
       console.error(err);
@@ -91,7 +92,8 @@ export default function UpdateIssueScreen() {
       setSubmitting(true);
       
       // Create update entry
-      const newPhotos = photos.filter(photo => !issue.photos.some(p => p.id === photo.id));
+      // All photos in the photos state are new uploads
+      const newPhotos = photos;
       
       const update = {
         timestamp: new Date().toISOString(),
@@ -105,7 +107,7 @@ export default function UpdateIssueScreen() {
       const updatedIssue: IssueReport = {
         ...issue,
         status,
-        photos: [...photos],
+        photos: [...issue.photos, ...newPhotos], // Add new photos to existing ones
         updates: [...(issue.updates || []), update]
       };
       
@@ -246,17 +248,17 @@ export default function UpdateIssueScreen() {
             numberOfLines={4}
           />
           
-          {/* Photo Management */}
+          {/* Photo Management - Only for adding new photos */}
           <ThemedView style={styles.sectionContainer}>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>Photos</ThemedText>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>Add New Photos</ThemedText>
             <ThemedText style={styles.sectionDescription}>
-              Current photos: {photos.length}
+              Upload new photos to document this update
             </ThemedText>
             
             <PhotoPicker
               photos={photos}
               onPhotosChange={handlePhotosChange}
-              maxPhotos={10} // Allow up to 10 photos 
+              maxPhotos={10} // Allow up to 10 new photos
             />
           </ThemedView>
         </ThemedView>
@@ -273,9 +275,9 @@ export default function UpdateIssueScreen() {
           onPress={() => router.back()}
           disabled={submitting}
         >
-          <ThemedView className="flex-row items-center justify-center">
+          <ThemedView className="flex-row items-center justify-center" style={{ backgroundColor: 'transparent' }}>
             <IconSymbol size={20} name="xmark" color="#6B7280" />
-            <ThemedText className="font-medium ml-2" style={{ color: '#6B7280' }}>
+            <ThemedText className="font-medium ml-2" style={{ color: '#6B7280', backgroundColor: 'transparent' }}>
               Cancel
             </ThemedText>
           </ThemedView>
@@ -290,9 +292,9 @@ export default function UpdateIssueScreen() {
           onPress={handleSubmit}
           disabled={submitting}
         >
-          <ThemedView className="flex-row items-center justify-center">
+          <ThemedView className="flex-row items-center justify-center" style={{ backgroundColor: 'transparent' }}>
             <IconSymbol size={20} name="checkmark.circle.fill" color="#FFFFFF" />
-            <ThemedText className="font-medium ml-2" style={{ color: '#FFFFFF' }}>
+            <ThemedText className="font-medium ml-2" style={{ color: '#FFFFFF', backgroundColor: 'transparent' }}>
               {submitting ? 'Updating...' : 'Save Update'}
             </ThemedText>
           </ThemedView>

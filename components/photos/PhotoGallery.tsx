@@ -83,11 +83,10 @@ export function PhotoGallery({ photos, title = 'Photos', onPhotoRemove }: PhotoG
   }, [onPhotoRemove]);
   
   // PhotoItem component to fix hooks error
-  const PhotoItem = React.memo(({ photo, index, onPress, onRemove }: {
+  const PhotoItem = React.memo(({ photo, index, onPress }: {
     photo: Photo;
     index: number;
     onPress: (index: number) => void;
-    onRemove?: (id: string) => void;
   }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -131,29 +130,6 @@ export function PhotoGallery({ photos, title = 'Photos', onPhotoRemove }: PhotoG
             )}
           </View>
         </TouchableOpacity>
-        
-          {/* Separate delete button below the photo */}
-          {onRemove && (
-            <TouchableOpacity
-              style={{
-                backgroundColor: '#E11D48',
-                padding: 10,
-                borderRadius: 4,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginTop: 8
-              }}
-              onPress={() => {
-                console.log('Delete TouchableOpacity pressed for photo:', photo.id);
-                onRemove(photo.id);
-              }}
-              activeOpacity={0.7}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <IconSymbol name="trash.fill" size={16} color="#FFFFFF" />
-            </TouchableOpacity>
-          )}
       </View>
     );
   });
