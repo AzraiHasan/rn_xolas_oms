@@ -31,30 +31,30 @@ export default function TabLayout() {
             position: 'absolute',
             backgroundColor: 'transparent',
             borderTopWidth: 0,
-            height: 70, // Increased height
-            paddingBottom: 15, // Increased bottom padding
+            height: 90, // Adjusted to match action buttons (50 + 16 + 24)
+            paddingBottom: 24, // Matches action buttons padding
           },
           android: {
             backgroundColor: colorScheme === 'dark' ? '#121212' : '#FFFFFF',
             elevation: 8,
-            height: 70, // Increased height
-            paddingBottom: 15, // Increased bottom padding
+            height: 90, // Adjusted to match action buttons (50 + 16 + 24)
+            paddingBottom: 24, // Matches action buttons padding
           },
           default: {
             backgroundColor: colorScheme === 'dark' ? '#121212' : '#FFFFFF',
-            height: 70, // Increased height
-            paddingBottom: 15, // Increased bottom padding
+            height: 90, // Adjusted to match action buttons (50 + 16 + 24)
+            paddingBottom: 24, // Matches action buttons padding
           },
         }),
         tabBarLabelStyle: {
           fontFamily: 'Inter',
           fontSize: 12,
           paddingBottom: 0,
-          marginTop: 1, // Reduced spacing between icon and text
+          marginTop: 2, // Slight adjustment for better positioning
         },
         tabBarIconStyle: {
-          marginTop: 8,
-          marginBottom: 2, // Reduced spacing between icon and text
+          marginTop: 12, // Adjusted for the increased height
+          marginBottom: 2,
         },
       }}>
       <Tabs.Screen

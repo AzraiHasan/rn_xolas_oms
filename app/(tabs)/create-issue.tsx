@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
+import { StyleSheet, ScrollView, Pressable, Alert, Platform } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
+import { Header, PageLayout } from '@/components/layouts';
 import { FormField, TextAreaField, SeveritySelector, DropdownField } from '@/components/forms';
 import { PhotoPicker } from '@/components/photos/fixed/PhotoPicker';
 import { Colors } from '@/constants/Colors';
@@ -20,7 +21,6 @@ export default function CreateIssueScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   
   const {
     values,
@@ -115,10 +115,13 @@ export default function CreateIssueScreen() {
   };
 
   return (
-    <ThemedView style={[styles.container, { paddingTop: insets.top }]}>
+    <PageLayout
+      header={<Header title="New Issue" />}
+    >
       <Stack.Screen options={{ 
-        title: 'New Issue',
-        contentStyle: { paddingTop: 0 }
+        headerShown: false,
+        // This will hide the tab bar for this screen
+        tabBarStyle: { display: 'none' }
       }} />
       
       <ScrollView 
@@ -196,45 +199,98 @@ export default function CreateIssueScreen() {
           maxPhotos={5}
         />
 
+        {/* Buttons will be in the footer instead */}
+      </ScrollView>
+      
+      {/* Fixed action buttons at the bottom */}
+      <ThemedView style={[
+        styles.actionsContainer,
+        { 
+          backgroundColor: Platform.select({
+            ios: 'transparent', // Use transparent on iOS for blur effect
+            android: colorScheme === 'dark' ? '#121212' : '#FFFFFF',
+            default: colorScheme === 'dark' ? '#121212' : '#FFFFFF'
+          }),
+          borderTopColor: colorScheme === 'dark' ? '#333333' : '#EEEEEE',
+          borderTopWidth: Platform.OS === 'ios' ? 0 : 1 // No border on iOS
+        }
+      ]}>
         <Pressable
           style={[
-            styles.submitButton,
-            { backgroundColor: colors.primary },
-            isSubmitting && { opacity: 0.7 }
+            styles.actionButton
           ]}
           onPress={handleFormSubmit}
           disabled={isSubmitting}
         >
-          <ThemedText style={styles.submitButtonText}>
-            {isSubmitting ? 'Saving...' : 'Create Issue'}
+          <MaterialCommunityIcons 
+            name="check-circle" 
+            size={28} 
+            color={colors.primary}
+          />
+          <ThemedText style={[styles.buttonText, { color: colors.primary, marginTop: 2 }]}>
+            {isSubmitting ? 'Saving...' : 'Create'}
           </ThemedText>
         </Pressable>
-      </ScrollView>
-    </ThemedView>
+        
+        <Pressable
+          style={[
+            styles.actionButton,
+            styles.cancelButton
+          ]}
+          onPress={() => router.navigate('/(tabs)/')}
+        >
+          <MaterialCommunityIcons 
+            name="close-circle" 
+            size={28} 
+            color={colors.text}
+          />
+          <ThemedText style={[styles.buttonText, { color: colors.text, marginTop: 2 }]}>
+            Cancel
+          </ThemedText>
+        </Pressable>
+      </ThemedView>
+    </PageLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   formContainer: {
     flex: 1,
   },
   formContent: {
     padding: 16,
-    paddingBottom: 40,
+    paddingBottom: 100, // Add extra padding to account for the fixed buttons
   },
-  submitButton: {
+  actionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 16,
+    paddingBottom: 24, // Extra padding at the bottom to match tab bar
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100,
+    height: 90, // Total height to match tab bar
+  },
+  actionButton: {
+    flex: 1,
+    height: 50,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
+    marginHorizontal: 8,
+    backgroundColor: 'transparent',
+    paddingVertical: 8,
   },
-  submitButtonText: {
+  cancelButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+  },
+  buttonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '600',
   }
 });

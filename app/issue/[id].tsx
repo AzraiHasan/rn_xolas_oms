@@ -1,7 +1,7 @@
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Alert, Pressable } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Alert, Pressable, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 
@@ -398,13 +398,23 @@ export default function IssueDetailScreen() {
       </ScrollView>
       
       {/* Action Buttons - Fixed at bottom */}
-      <ThemedView style={styles.actionsContainer}>
+      <ThemedView style={[
+        styles.actionsContainer,
+        { 
+          backgroundColor: Platform.select({
+            ios: 'transparent', // Use transparent on iOS for blur effect
+            android: colorScheme === 'dark' ? '#121212' : '#FFFFFF',
+            default: colorScheme === 'dark' ? '#121212' : '#FFFFFF'
+          }),
+          borderTopColor: colorScheme === 'dark' ? '#333333' : '#EEEEEE',
+          borderTopWidth: Platform.OS === 'ios' ? 0 : 1 // No border on iOS
+        }
+      ]}>
         <Pressable
-          className="flex-1 py-3 md:py-4 rounded-lg items-center justify-center mx-2 border"
-          style={{
-            backgroundColor: 'transparent',
-            borderColor: '#2563EB'
-          }}
+          style={[
+            styles.actionButton,
+            styles.updateButton
+          ]}
           onPress={() => {
             router.navigate({
               pathname: '/issue/update/[id]', 
@@ -412,26 +422,19 @@ export default function IssueDetailScreen() {
             });
           }}
         >
-          <ThemedView className="flex-row items-center justify-center">
-            <IconSymbol size={20} name="pencil" color="#2563EB" />
-            <ThemedText className="font-medium md:text-base ml-2" style={{ color: '#2563EB' }}>Update</ThemedText>
-          </ThemedView>
+          <IconSymbol size={28} name="pencil-circle" color="#2563EB" />
+          <ThemedText style={[styles.buttonText, { color: '#2563EB', marginTop: 2 }]}>Update</ThemedText>
         </Pressable>
         
         <Pressable
-          className="flex-1 py-3 md:py-4 rounded-lg items-center justify-center mx-2 border"
-          style={{
-            backgroundColor: 'transparent',
-            borderColor: '#E11D48'
-          }}
+          style={[
+            styles.actionButton,
+            styles.deleteButton
+          ]}
           onPress={handleDeleteIssue}
         >
-          <ThemedView className="flex-row items-center justify-center">
-            <IconSymbol size={20} name="trash.fill" color="#E11D48" />
-            <ThemedText className="font-medium md:text-base ml-2" style={{ color: '#E11D48' }}>
-              Delete
-            </ThemedText>
-          </ThemedView>
+          <IconSymbol size={28} name="delete-circle" color="#E11D48" />
+          <ThemedText style={[styles.buttonText, { color: '#E11D48', marginTop: 2 }]}>Delete</ThemedText>
         </Pressable>
       </ThemedView>
     </ThemedView>
@@ -478,7 +481,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 80, // Add extra padding for fixed buttons
+    paddingBottom: 100, // Add extra padding for fixed buttons to match actionsContainer height
     paddingTop: 0, // Reduced top padding since we have the header
   },
   issueHeader: {
@@ -538,19 +541,34 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 10,
-    paddingBottom: 15,
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderTopWidth: 1,
-    borderTopColor: '#EEEEEE',
+    padding: 16,
+    paddingBottom: 24, // Extra padding at the bottom to match tab bar
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     zIndex: 100,
+    height: 90, // Total height to match tab bar
   },
   actionButton: {
     flex: 1,
+    height: 50,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 8,
+    backgroundColor: 'transparent',
+    paddingVertical: 8,
+  },
+  updateButton: {
+    // Specific styles for update button
+  },
+  deleteButton: {
+    // Specific styles for delete button
+  },
+  buttonText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
   loadingContainer: {
     flex: 1,
