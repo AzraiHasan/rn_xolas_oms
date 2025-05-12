@@ -1,7 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Alert, Pressable } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Alert, Pressable, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PhotoPicker } from '@/components/photos/fixed/PhotoPicker';
@@ -264,40 +264,44 @@ export default function UpdateIssueScreen() {
         </ThemedView>
       </ScrollView>
       
-      {/* Action Buttons */}
-      <ThemedView style={styles.actionsContainer}>
+      {/* Action Buttons - Fixed at bottom */}
+      <ThemedView style={[
+        styles.actionsContainer,
+        { 
+          backgroundColor: Platform.select({
+            ios: 'transparent', // Use transparent on iOS for blur effect
+            android: colorScheme === 'dark' ? '#121212' : '#FFFFFF',
+            default: colorScheme === 'dark' ? '#121212' : '#FFFFFF'
+          }),
+          borderTopColor: colorScheme === 'dark' ? '#333333' : '#EEEEEE',
+          borderTopWidth: Platform.OS === 'ios' ? 0 : 1 // No border on iOS
+        }
+      ]}>
         <Pressable
-          className="flex-1 py-3 rounded-lg items-center justify-center mx-2 border"
-          style={{
-            backgroundColor: 'transparent',
-            borderColor: '#6B7280'
-          }}
-          onPress={() => router.back()}
-          disabled={submitting}
-        >
-          <ThemedView className="flex-row items-center justify-center" style={{ backgroundColor: 'transparent' }}>
-            <IconSymbol size={20} name="xmark" color="#6B7280" />
-            <ThemedText className="font-medium ml-2" style={{ color: '#6B7280', backgroundColor: 'transparent' }}>
-              Cancel
-            </ThemedText>
-          </ThemedView>
-        </Pressable>
-        
-        <Pressable
-          className="flex-1 py-3 rounded-lg items-center justify-center mx-2"
-          style={{
-            backgroundColor: colors.primary,
-            opacity: submitting ? 0.7 : 1
-          }}
+          style={[
+            styles.actionButton,
+            styles.submitButton,
+            { opacity: submitting ? 0.7 : 1 }
+          ]}
           onPress={handleSubmit}
           disabled={submitting}
         >
-          <ThemedView className="flex-row items-center justify-center" style={{ backgroundColor: 'transparent' }}>
-            <IconSymbol size={20} name="checkmark.circle.fill" color="#FFFFFF" />
-            <ThemedText className="font-medium ml-2" style={{ color: '#FFFFFF', backgroundColor: 'transparent' }}>
-              {submitting ? 'Updating...' : 'Save Update'}
-            </ThemedText>
-          </ThemedView>
+          <IconSymbol size={28} name="check-circle" color="#2563EB" />
+          <ThemedText style={[styles.buttonText, { color: '#2563EB', marginTop: 2 }]}>
+            {submitting ? 'Updating...' : 'Save'}
+          </ThemedText>
+        </Pressable>
+        
+        <Pressable
+          style={[
+            styles.actionButton,
+            styles.cancelButton
+          ]}
+          onPress={() => router.back()}
+          disabled={submitting}
+        >
+          <IconSymbol size={28} name="close-circle" color="#6B7280" />
+          <ThemedText style={[styles.buttonText, { color: '#6B7280', marginTop: 2 }]}>Cancel</ThemedText>
         </Pressable>
       </ThemedView>
     </SafeAreaView>
@@ -340,16 +344,34 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 10,
-    paddingBottom: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderTopWidth: 1,
-    borderTopColor: '#EEEEEE',
+    padding: 16,
+    paddingBottom: 24, // Extra padding at the bottom to match tab bar
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     zIndex: 100,
+    height: 90, // Total height to match tab bar
+  },
+  actionButton: {
+    flex: 1,
+    height: 50,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 8,
+    backgroundColor: 'transparent',
+    paddingVertical: 8,
+  },
+  cancelButton: {
+    // Specific styles for cancel button
+  },
+  submitButton: {
+    // Specific styles for submit button
+  },
+  buttonText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
   loadingContainer: {
     flex: 1,

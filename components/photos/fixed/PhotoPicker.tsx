@@ -214,26 +214,24 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
           {photos.length < maxPhotos && (
             <ThemedView className="flex-row justify-center items-center gap-4">
               <Pressable
-                className="w-20 h-20 md:w-24 md:h-24 rounded-lg items-center justify-center"
-                style={{ backgroundColor: colors.primary }}
+                className="w-16 h-16 md:w-20 md:h-20 rounded-lg items-center justify-center border"
+                style={{ borderColor: '#FF8C38' }}
                 onPress={takePhoto}
               >
-                <Ionicons name="camera" size={24} color="white" />
-                <ThemedText className="text-white mt-1 text-xs">Camera</ThemedText>
+                <Ionicons name="camera" size={24} color="#FF8C38" />
               </Pressable>
               <Pressable
-                className="w-20 h-20 md:w-24 md:h-24 rounded-lg items-center justify-center"
-                style={{ backgroundColor: colors.primary }}
+                className="w-16 h-16 md:w-20 md:h-20 rounded-lg items-center justify-center border"
+                style={{ borderColor: '#FF8C38' }}
                 onPress={pickImage}
               >
-                <Ionicons name="images" size={24} color="white" />
-                <ThemedText className="text-white mt-1 text-xs">Gallery</ThemedText>
+                <Ionicons name="images" size={24} color="#FF8C38" />
               </Pressable>
             </ThemedView>
           )}
           
           {photos.length === 0 && (
-            <ThemedText className="opacity-50 absolute bottom-2 text-center">
+            <ThemedText className="opacity-50 absolute bottom-2 text-xs text-center">
               Take or select up to {maxPhotos} photos
             </ThemedText>
           )}
