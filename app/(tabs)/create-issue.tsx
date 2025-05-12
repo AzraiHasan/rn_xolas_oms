@@ -117,6 +117,7 @@ export default function CreateIssueScreen() {
   return (
     <PageLayout
       header={<Header title="New Issue" />}
+      disableSafeArea={true}
     >
       <Stack.Screen options={{ 
         headerShown: false,

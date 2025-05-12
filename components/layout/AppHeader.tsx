@@ -18,25 +18,10 @@ export function AppHeader({ title, showBackButton = false, rightComponent }: App
   const { getColor } = useTheme();
 
   return (
-    <ThemedView className="px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-      <ThemedView className="mb-2 flex-row items-center justify-end">
-        {rightComponent || null}
-      </ThemedView>
-      
-      <ThemedView className="flex-row items-center">
-        {showBackButton && (
-          <Pressable 
-            onPress={() => navigation.goBack()} 
-            className="mr-2"
-          >
-            <IconSymbol 
-              name="chevron.left" 
-              size={24} 
-              color={getColor('text')} 
-            />
-          </Pressable>
-        )}
+    <ThemedView className="px-4 py-1 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+      <ThemedView className="flex-row items-center justify-between">
         <ThemedText className="text-lg font-semibold">{title}</ThemedText>
+        {rightComponent || null}
       </ThemedView>
     </ThemedView>
   );

@@ -262,8 +262,6 @@ export default function HomeScreen() {
           className="h-[178px] w-[290px] absolute bottom-0 left-0"
         />
       }>
-      <AppHeader title="Issue Dashboard" />
-      
       {renderContent()}
     </ParallaxScrollView>
   );
