@@ -256,12 +256,11 @@ export default function IssueDetailScreen() {
         <Pressable 
           onPress={() => router.back()} 
           style={[styles.backButton, { 
-            backgroundColor: colorScheme === 'dark' ? colors.dark[700] : '#FFFFFF',
-            borderWidth: 1,
-            borderColor: colorScheme === 'dark' ? colors.dark[500] : '#666666'
+            backgroundColor: '#FF8C38',
+            borderWidth: 0
           }]}
         >
-          <IconSymbol name="chevron.left" size={24} color={colors.text} />
+          <IconSymbol name="chevron.left" size={24} color="#FFFFFF" />
         </Pressable>
         <ThemedText type="title" style={styles.headerTitle}>Issue Details</ThemedText>
         <ThemedView style={styles.headerRight} />
@@ -302,7 +301,7 @@ export default function IssueDetailScreen() {
             styles.severityBadge, 
             { backgroundColor: getSeverityColor(issue.severity) }
           ]}>
-            <ThemedText style={styles.severityText}>{issue.severity}</ThemedText>
+            <ThemedText style={[styles.severityText, { color: '#FFFFFF' }]}>{issue.severity}</ThemedText>
           </ThemedView>
           
           <ThemedView style={styles.metaItem}>

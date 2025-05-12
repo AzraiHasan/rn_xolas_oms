@@ -255,11 +255,22 @@ export default function HomeScreen() {
   
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+      headerBackgroundColor={{ light: '#FFC77D', dark: '#FF8C38' }}
       headerImage={
         <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          className="h-[178px] w-[290px] absolute bottom-0 left-0"
+          source={colorScheme === 'dark' 
+            ? require('@/assets/images/logo_Light.png')
+            : require('@/assets/images/logo_color.png')}
+          style={{
+            height: 162,
+            width: 264,
+            position: 'absolute',
+            bottom: 20,
+            alignSelf: 'center',
+            zIndex: 10,
+            opacity: 0.75
+          }}
+          contentFit="contain"
         />
       }>
       {renderContent()}
