@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useTheme } from '@/hooks/theme/useTheme';
 
 interface AppHeaderProps {
@@ -21,7 +20,7 @@ export function AppHeader({ title, showBackButton = false, rightComponent }: App
   return (
     <ThemedView className="px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
       <ThemedView className="mb-2 flex-row items-center justify-end">
-        {rightComponent || <ThemeToggle />}
+        {rightComponent || null}
       </ThemedView>
       
       <ThemedView className="flex-row items-center">

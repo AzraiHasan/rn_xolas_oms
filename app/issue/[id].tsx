@@ -11,7 +11,6 @@ import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { useThemeContext } from '@/contexts/ThemeContext';
 import { useIssues } from '@/contexts/IssueContext';
 import { IssueReport, IssueSeverity } from '@/types/models/Issue';
 
@@ -25,7 +24,6 @@ export default function IssueDetailScreen() {
   const insets = useSafeAreaInsets();
   
   const colorScheme = useColorScheme();
-  const { toggleColorScheme } = useThemeContext();
   const colors = Colors[colorScheme ?? 'light'];
   
   const { 
@@ -266,25 +264,7 @@ export default function IssueDetailScreen() {
           <IconSymbol name="chevron.left" size={24} color={colors.text} />
         </Pressable>
         <ThemedText type="title" style={styles.headerTitle}>Issue Details</ThemedText>
-        
-        {/* Add theme toggle button */}
-        <Pressable
-          style={{
-            backgroundColor: colorScheme === 'dark' ? '#444' : '#ddd',
-            width: 36,
-            height: 36,
-            borderRadius: 18,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          onPress={toggleColorScheme}
-        >
-          <IconSymbol 
-            name={colorScheme === 'dark' ? 'white-balance-sunny' : 'moon-waning-crescent'} 
-            size={20} 
-            color={colorScheme === 'dark' ? '#fff' : '#000'}
-          />
-        </Pressable>
+        <ThemedView style={styles.headerRight} />
       </ThemedView>
       
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
