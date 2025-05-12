@@ -94,6 +94,69 @@ flowchart TD
 
 ```
 
+# Project Structure
+
+## App (Routing)
+- app/
+  - _layout.tsx (Navigation container with tabs)
+  - index.tsx (Home screen/Dashboard)
+  - issues/
+    - index.tsx (Issue list screen)
+    - [id].tsx (Issue detail screen) 
+    - new.tsx (New issue form screen)
+
+## Components
+- components/
+  - ui/ (Reusable UI components with NativeWind)
+    - Button.tsx
+    - Card.tsx
+    - Input.tsx
+    - Select.tsx
+    - Badge.tsx (for severity indicators)
+  - issues/
+    - IssueCard.tsx (List item component)
+    - IssueForm.tsx (Form for creating issues)
+    - PhotoAttachment.tsx (Photo handling component)
+    - PhotoGallery.tsx (Grid view of thumbnails)
+    - PhotoViewer.tsx (Full-screen photo view)
+
+## Types
+- types/
+  - issue.ts (Issue and related interfaces)
+  - photo.ts (Photo type definitions)
+
+## Services
+- services/
+  - storage/
+    - issueStorage.ts (AsyncStorage for issue data)
+    - photoStorage.ts (Expo FileSystem for photos)
+  - camera/
+    - cameraService.ts (Expo Camera integration)
+  - imagePicker/
+    - imagePickerService.ts (Gallery integration)
+
+## Hooks
+- hooks/
+  - useIssues.ts (CRUD operations for issues)
+  - usePhotos.ts (Photo management)
+  - useCamera.ts (Camera interactions)
+
+## Utilities
+- utils/
+  - date.ts (Date formatting)
+  - validation.ts (Form validation)
+  - fileSystem.ts (File handling)
+
+## Constants
+- constants/
+  - colors.ts (Theme colors)
+  - severity.ts (Severity levels)
+  - layout.ts (Screen dimensions and spacing)
+
+## Context
+- contexts/
+  - IssueContext.tsx (Global state for issues)
+
 **2. Goals/Objectives**
 
 *   **Primary Goal:** Enable technicians to quickly create and submit site issue reports, including attached photos, using a mobile device.

@@ -70,7 +70,7 @@ export function IssueCard({ issue, style, onPress }: IssueCardProps) {
             className="px-2 py-0.5 rounded-xl"
             style={{ backgroundColor: getSeverityColor() }}
           >
-            <ThemedText className="text-white text-xs font-medium">{issue.severity}</ThemedText>
+            <ThemedText className="text-xs font-medium" style={{ color: issue.severity === IssueSeverity.High ? '#FFFFFF' : undefined }}>{issue.severity}</ThemedText>
           </ThemedView>
         </ThemedView>
         

@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { Link } from 'expo-router';
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import { StyleProp, TouchableOpacity, ViewStyle } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -12,12 +12,13 @@ import { IssueReport, IssueSeverity } from '@/types/models/Issue';
 
 interface RecentActivityItemProps {
   issue: IssueReport;
+  style?: StyleProp<ViewStyle>;
 }
 
 /**
  * Component displaying a recent activity item for the dashboard
  */
-export function RecentActivityItem({ issue }: RecentActivityItemProps) {
+export function RecentActivityItem({ issue, style }: RecentActivityItemProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   
@@ -70,65 +71,85 @@ export function RecentActivityItem({ issue }: RecentActivityItemProps) {
   return (
     <Link href={{ pathname: '/issue/[id]', params: { id: issue.id } }} asChild>
       <TouchableOpacity activeOpacity={0.7}>
-        <ThemedView className="flex-row py-3 px-4 md:py-4 md:px-5 border-b border-[#E4E7EB] dark:border-gray-700">
-          <ThemedView 
-            className="w-9 h-9 md:w-12 md:h-12 rounded-full items-center justify-center mr-3 mt-0"
-            style={{ backgroundColor: `${getSeverityColor()}20` }}
-          >
-            <IconSymbol 
-              name={getSeverityIconName()} 
-              size={18} 
-              className="md:scale-125"
-              color={getSeverityColor()} 
-            />
-          </ThemedView>
-          
+        <ThemedView 
+          className="py-4 px-4 md:py-5 md:px-5 border-b"
+          style={[{ borderColor: colorScheme === 'dark' ? '#3E4144' : '#E4E7EB' }, style]}
+        >
+          <ThemedView className="flex-row">
           <ThemedView className="flex-1 mr-3">
-          <ThemedText 
-          type="defaultSemiBold" 
-          numberOfLines={1} 
-          className="text-[15px] md:text-base mb-1"
-          >
-          {issue.title}
-          </ThemedText>
-          
-          <ThemedView className="mb-1">
-          <ThemedView className="flex-row items-center">
-          <IconSymbol name="mappin.circle.fill" size={12} color={colors.icon} />
-          <ThemedText 
-          numberOfLines={1}
-          className="text-xs md:text-sm ml-1 text-[#687076] dark:text-gray-400"
-          >
-          {issue.location}
-          </ThemedText>
+            <ThemedView className="flex-row justify-between items-center mb-1">
+              <ThemedText 
+                type="defaultSemiBold" 
+                className="text-base flex-1 mr-2" 
+                numberOfLines={1}
+              >
+                {issue.title}
+              </ThemedText>
+              
+              <ThemedView
+                className="px-2 py-0.5 rounded-xl"
+                style={{ backgroundColor: getSeverityColor() }}
+              >
+                <ThemedText className="text-xs font-medium" style={{ color: issue.severity === IssueSeverity.High ? '#FFFFFF' : undefined }}>{issue.severity}</ThemedText>
+              </ThemedView>
+            </ThemedView>
+            
+            <ThemedView className="flex-row flex-wrap">
+              <ThemedView className="flex-row items-center mr-3 mb-1">
+                <IconSymbol name="mappin.circle.fill" size={12} color={colors.icon} />
+                <ThemedText 
+                  numberOfLines={1}
+                  className="text-xs ml-1"
+                >
+                  {issue.location}
+                </ThemedText>
+              </ThemedView>
+              
+              <ThemedView className="flex-row items-center mr-3 mb-1">
+                <IconSymbol name="calendar-month" size={12} color={colors.icon} />
+                <ThemedText className="text-xs ml-1">
+                  {getRelativeTime(issue.timestamp)}
+                </ThemedText>
+              </ThemedView>
+              
+              <ThemedView className="flex-row items-center mr-3 mb-1">
+                <IconSymbol name="chart-bar" size={12} color={colors.icon} />
+                <ThemedText className="text-xs ml-1">
+                  {/* Show status history if exists, otherwise just current status */}
+                  {issue.updates && issue.updates.length > 0 ? 
+                  `${issue.updates[issue.updates.length - 1].previousStatus} → ${issue.status}` : 
+                  issue.status
+                  }
+                </ThemedText>
+              </ThemedView>
+            </ThemedView>
+            
+            <ThemedText className="text-sm mb-3 mt-3" numberOfLines={2}>
+              {issue.description}
+            </ThemedText>
           </ThemedView>
           
-          <ThemedView className="flex-row items-center mt-1">
-          <IconSymbol name="chart-bar" size={12} color={colors.icon} />
-          <ThemedText className="text-xs md:text-sm ml-1 text-[#687076] dark:text-gray-400">
-          {/* Show status history if exists, otherwise just current status */}
-          {issue.updates && issue.updates.length > 0 ? 
-          `${issue.updates[issue.updates.length - 1].previousStatus} → ${issue.status}` : 
-          issue.status
-          }
-          </ThemedText>
-          </ThemedView>
-          </ThemedView>
-          
-          <ThemedText className="text-xs md:text-sm text-right text-[#687076] dark:text-gray-400 pt-2">
-          {getRelativeTime(issue.timestamp)}
-          </ThemedText>
-          </ThemedView>
-          
-          {issue.photos.length > 0 && (
+        </ThemedView>
+        
+        {issue.photos.length > 0 && (
+          <ThemedView className="relative">
             <Image
               source={{ uri: issue.photos[0].uri }}
-              className="w-12 h-12 md:w-16 md:h-16 rounded-md"
+              className="w-full h-[140px] md:h-[180px] rounded-lg"
               contentFit="cover"
             />
-          )}
-        </ThemedView>
+            
+            {issue.photos.length > 1 && (
+              <ThemedView className="absolute bottom-2 right-2 bg-black/75 rounded-xl px-2 py-1">
+                <ThemedText className="text-white text-xs font-medium">+{issue.photos.length - 1}</ThemedText>
+              </ThemedView>
+            )}
+          </ThemedView>
+        )}
+      </ThemedView>
       </TouchableOpacity>
     </Link>
   );
 }
+
+// Apply last-child no border styling in the index.tsx wrapper

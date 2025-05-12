@@ -209,7 +209,7 @@ export function IssueDetailScreen({ issueId }: IssueDetailScreenProps) {
             styles.severityBadge, 
             { backgroundColor: getSeverityColor(issue.severity) }
           ]}>
-            <ThemedText style={styles.severityText}>{issue.severity}</ThemedText>
+          <ThemedText style={[styles.severityText, { color: issue.severity === IssueSeverity.High ? '#FFFFFF' : undefined }]}>{issue.severity}</ThemedText>
           </ThemedView>
         </ThemedView>
         
@@ -254,7 +254,7 @@ export function IssueDetailScreen({ issueId }: IssueDetailScreenProps) {
             }}
           />
         </View>
-      </ThemedView>
+      </View>
     </SafeAreaView>
   );
 }

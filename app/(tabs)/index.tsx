@@ -238,8 +238,12 @@ export default function HomeScreen() {
           
           {stats.recentIssues.length > 0 ? (
             <ThemedView className="border border-[#E4E7EB] dark:border-gray-700 rounded-xl overflow-hidden">
-              {stats.recentIssues.map((issue) => (
-                <RecentActivityItem key={issue.id} issue={issue} />
+              {stats.recentIssues.map((issue, index) => (
+                <RecentActivityItem 
+                  key={issue.id} 
+                  issue={issue} 
+                  style={index === stats.recentIssues.length - 1 ? { borderBottomWidth: 0 } : undefined}
+                />
               ))}
             </ThemedView>
           ) : (
