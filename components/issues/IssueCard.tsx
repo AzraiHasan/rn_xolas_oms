@@ -8,7 +8,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { IssueReport, IssueSeverity } from '@/types/models/Issue';
+import { IssueReport, IssueSeverity, IssueStatus } from '@/types/models/Issue';
 
 export interface IssueCardProps {
   /**
@@ -41,6 +41,21 @@ export function IssueCard({ issue, style, onPress }: IssueCardProps) {
       case IssueSeverity.Medium:
         return '#F59E0B';
       case IssueSeverity.Low:
+        return '#10B981';
+      default:
+        return colors.text;
+    }
+  };
+  
+  const getStatusColor = () => {
+    switch (issue.status) {
+      case IssueStatus.New:
+        return '#3B82F6';
+      case IssueStatus.Assigned:
+        return '#8B5CF6';
+      case IssueStatus.InProgress:
+        return '#F97316';
+      case IssueStatus.Resolved:
         return '#10B981';
       default:
         return colors.text;
@@ -85,6 +100,17 @@ export function IssueCard({ issue, style, onPress }: IssueCardProps) {
           <ThemedView className="flex-row items-center mr-3 mb-1">
             <IconSymbol size={14} name="calendar-month" color={colors.icon} />
             <ThemedText className="text-xs ml-1">{formattedDate}</ThemedText>
+          </ThemedView>
+          
+          <ThemedView className="flex-row items-center mr-3 mb-1">
+            <IconSymbol size={14} name="chart-bar" color={colors.icon} />
+            <ThemedText className="text-xs ml-1">
+              {/* Show status history if exists, otherwise just current status */}
+              {issue.updates && issue.updates.length > 0 ? 
+              `${issue.updates[issue.updates.length - 1].previousStatus} → ${issue.status}` : 
+              issue.status
+              }
+            </ThemedText>
           </ThemedView>
         </ThemedView>
       </ThemedView>

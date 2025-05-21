@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { SymbolWeight, SymbolViewProps } from 'expo-symbols';
+import { SymbolWeight } from 'expo-symbols';
 import { ComponentProps } from 'react';
-import { OpaqueColorValue, StyleProp, TextStyle, Platform, Text } from 'react-native';
+import { OpaqueColorValue, StyleProp, TextStyle } from 'react-native';
 
 // Define Material Community Icons mapping
 const MATERIAL_ICON_MAPPING: Record<string, string> = {
@@ -80,7 +80,7 @@ export function IconSymbol({
   
   return (
     <MaterialCommunityIcons 
-      name={iconName} 
+      name={iconName as ComponentProps<typeof MaterialCommunityIcons>["name"]} 
       size={size} 
       color={color} 
       style={style}
@@ -88,3 +88,4 @@ export function IconSymbol({
     />
   );
 }
+

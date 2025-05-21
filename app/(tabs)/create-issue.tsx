@@ -11,9 +11,21 @@ import { PhotoPicker } from '@/components/photos/fixed/PhotoPicker';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useForm } from '@/hooks/forms/useForm';
-import { IssueReportInput, IssueSeverity, IssueStatus, Photo } from '@/types/models/Issue';
+import { IssueReportInput, IssueSeverity, IssueStatus, IssueCategory, Photo } from '@/types/models/Issue';
 import { requiredValidator, minLengthValidator } from '@/utils/validation';
 import { useIssues } from '@/contexts/IssueContext';
+import { ValidationRule } from '@/utils/validation';
+
+// Create validators that handle potentially undefined values
+const safeRequiredValidator: ValidationRule<string | undefined> = {
+  validator: (value?: string) => !!value,
+  message: 'This field is required'
+};
+
+const safeMinLengthValidator = (minLength: number): ValidationRule<string | undefined> => ({
+  validator: (value?: string) => value ? value.length >= minLength : false,
+  message: `Must be at least ${minLength} characters`
+});
 
 export default function CreateIssueScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,6 +44,7 @@ export default function CreateIssueScreen() {
   } = useForm<Partial<IssueReportInput>>({
     initialValues: {
       title: '',
+      category: IssueCategory.Docket,
       description: '',
       location: '',
       severity: IssueSeverity.Medium,
@@ -41,15 +54,18 @@ export default function CreateIssueScreen() {
     },
     validators: {
       title: [
-        requiredValidator,
-        minLengthValidator(3)
+        safeRequiredValidator,
+        safeMinLengthValidator(3)
+      ],
+      category: [
+        safeRequiredValidator
       ],
       description: [
-        requiredValidator,
-        minLengthValidator(10)
+        safeRequiredValidator,
+        safeMinLengthValidator(10)
       ],
       location: [
-        requiredValidator
+        safeRequiredValidator
       ]
     },
     onSubmit: async (formValues) => {
@@ -72,7 +88,7 @@ export default function CreateIssueScreen() {
           [
             {
               text: 'OK',
-              onPress: () => router.navigate('/(tabs)/')
+              onPress: () => router.navigate('/')
             }
           ]
         );
@@ -91,7 +107,7 @@ export default function CreateIssueScreen() {
 
   // Handle photo changes
   const handlePhotosChange = (newPhotos: Photo[]) => {
-    handleChange('photos', newPhotos);
+    handleChangeValue('photos', newPhotos);
   };
 
   // Handle manual form submission with additional UI feedback
@@ -113,6 +129,11 @@ export default function CreateIssueScreen() {
       );
     }
   };
+  
+  // Type-safe wrapper for handleChange
+  const handleChangeValue = (name: string, value: any) => {
+    handleChange(name as any, value);
+  };
 
   return (
     <PageLayout
@@ -120,9 +141,8 @@ export default function CreateIssueScreen() {
       disableSafeArea={true}
     >
       <Stack.Screen options={{ 
-        headerShown: false,
-        // This will hide the tab bar for this screen
-        tabBarStyle: { display: 'none' }
+        headerShown: false
+        // Tab bar styling handled by layout
       }} />
       
       <ScrollView 
@@ -136,11 +156,28 @@ export default function CreateIssueScreen() {
           required
           placeholder="Enter issue title"
           value={values.title || ''}
-          onChangeValue={handleChange}
+          onChangeValue={handleChangeValue}
           onBlur={() => handleBlur('title')}
           error={errors.title}
           isError={!!errors.title}
           validationRules={[requiredValidator, minLengthValidator(3)]}
+        />
+
+        <DropdownField
+          label="Category"
+          required
+          placeholder="Select a category"
+          value={values.category || IssueCategory.Docket}
+          options={[
+            { value: IssueCategory.Docket, label: 'Docket' },
+            { value: IssueCategory.Vandalism, label: 'Vandalism' },
+            { value: IssueCategory.Corrective, label: 'Corrective' },
+            { value: IssueCategory.Preventive, label: 'Preventive' },
+            { value: IssueCategory.Audit, label: 'Audit' }
+          ]}
+          onChange={(category) => handleChangeValue('category', category)}
+          isError={false}
+          error={undefined}
         />
 
         <TextAreaField
@@ -149,7 +186,7 @@ export default function CreateIssueScreen() {
           required
           placeholder="Describe the issue in detail"
           value={values.description || ''}
-          onChangeValue={handleChange}
+          onChangeValue={handleChangeValue}
           onBlur={() => handleBlur('description')}
           error={errors.description}
           isError={!!errors.description}
@@ -163,7 +200,7 @@ export default function CreateIssueScreen() {
           required
           placeholder="Enter issue location"
           value={values.location || ''}
-          onChangeValue={handleChange}
+          onChangeValue={handleChangeValue}
           onBlur={() => handleBlur('location')}
           error={errors.location}
           isError={!!errors.location}
@@ -174,7 +211,7 @@ export default function CreateIssueScreen() {
           label="Severity"
           required
           value={values.severity || IssueSeverity.Medium}
-          onChange={(severity) => handleChange('severity', severity)}
+          onChange={(severity) => handleChangeValue('severity', severity)}
         />
 
         <DropdownField
@@ -188,7 +225,7 @@ export default function CreateIssueScreen() {
             { value: IssueStatus.InProgress, label: 'In Progress' },
             { value: IssueStatus.Resolved, label: 'Resolved' }
           ]}
-          onChange={(status) => handleChange('status', status)}
+          onChange={(status) => handleChangeValue('status', status)}
           isError={!!errors.status}
           error={errors.status}
         />
@@ -226,9 +263,9 @@ export default function CreateIssueScreen() {
           <MaterialCommunityIcons 
             name="check-circle" 
             size={28} 
-            color={colors.primary}
+            color="#FF5A1F" // Match tab bar active color
           />
-          <ThemedText style={[styles.buttonText, { color: colors.primary, marginTop: 2 }]}>
+          <ThemedText style={[styles.buttonText, { color: '#FF5A1F', marginTop: 2 }]}>
             {isSubmitting ? 'Saving...' : 'Create'}
           </ThemedText>
         </Pressable>
@@ -238,7 +275,7 @@ export default function CreateIssueScreen() {
             styles.actionButton,
             styles.cancelButton
           ]}
-          onPress={() => router.navigate('/(tabs)/')}
+          onPress={() => router.navigate('/')}
         >
           <MaterialCommunityIcons 
             name="close-circle" 

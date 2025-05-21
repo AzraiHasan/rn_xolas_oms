@@ -46,21 +46,13 @@ export default function IssueDetailScreen() {
     }
     
     try {
-      console.log('Fetching issue with ID:', issueId);
-      console.log('Current colorScheme:', colorScheme);
       const issueData = getIssueById(issueId);
-      console.log('Issue data found:', issueData ? 'YES' : 'NO');
-      if (issueData) {
-        console.log('Issue updates:', issueData.updates);
-        console.log('Dark update container style:', styles.dark_updateContainer);
-      }
       setIssue(issueData || null);
       
       if (!issueData) {
         setError('Issue not found');
       }
     } catch (err) {
-      console.error('Error fetching issue:', err);
       setError('Failed to load issue details');
     } finally {
       setLoading(false);
@@ -138,7 +130,6 @@ export default function IssueDetailScreen() {
                 throw new Error('Failed to delete issue');
               }
             } catch (error) {
-              console.error('Error deleting issue:', error);
               Alert.alert(
                 'Error',
                 'Failed to delete issue. Please try again.',
@@ -177,7 +168,6 @@ export default function IssueDetailScreen() {
                 throw new Error('Failed to remove photo');
               }
             } catch (error) {
-              console.error('Error removing photo:', error);
               Alert.alert(
                 'Error',
                 'Failed to remove photo. Please try again.',
@@ -256,11 +246,11 @@ export default function IssueDetailScreen() {
         <Pressable 
           onPress={() => router.back()} 
           style={[styles.backButton, { 
-            backgroundColor: '#FF8C38',
+            backgroundColor: 'transparent',
             borderWidth: 0
           }]}
         >
-          <IconSymbol name="chevron.left" size={24} color="#FFFFFF" />
+          <IconSymbol name="chevron.left" size={24} color="#000000" />
         </Pressable>
         <ThemedText type="title" style={styles.headerTitle}>Issue Details</ThemedText>
         <ThemedView style={styles.headerRight} />
@@ -269,17 +259,6 @@ export default function IssueDetailScreen() {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Issue Header */}
         <ThemedView style={styles.issueHeader}>
-          <ThemedView style={[
-            styles.severityIndicator, 
-            { backgroundColor: getSeverityColor(issue.severity) }
-          ]}>
-            <IconSymbol 
-              name={getSeverityIconName(issue.severity)} 
-              size={20} 
-              color="#FFFFFF" 
-            />
-          </ThemedView>
-          
           <ThemedText type="title" style={styles.title}>{issue.title}</ThemedText>
         </ThemedView>
         
@@ -329,14 +308,9 @@ export default function IssueDetailScreen() {
         {issue.updates && issue.updates.length > 0 && (
           <ThemedView style={[styles.sectionContainer, { marginTop: 0 }]}>
             <ThemedText type="subtitle">Update History</ThemedText>
-            {console.log('Rendering updates, count:', issue.updates.length)}
-            {console.log('colorScheme in render:', colorScheme)}
             {issue.updates.map((update, index) => {
-              console.log('Rendering update:', index, typeof update);
-              
               // Skip if update is not a valid object
               if (!update || typeof update !== 'object') {
-                console.log('Update is null, undefined, or not an object');
                 return null;
               }
               
@@ -348,7 +322,7 @@ export default function IssueDetailScreen() {
               
               // Use empty array if photos is undefined
               const photosArray = update.photos && Array.isArray(update.photos) ? update.photos : [];
-              console.log('Photos array length:', photosArray.length);
+
               
               return (
                 <ThemedView key={index} style={[styles.updateContainer, darkContainerStyle]}>
@@ -369,11 +343,8 @@ export default function IssueDetailScreen() {
                     <ThemedView style={styles.updatePhotosContainer}>
                       <ThemedText style={styles.photosSectionTitle}>Photos Added:</ThemedText>
                       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.photoScroll}>
-                        {console.log('Photos data structure:', JSON.stringify(update.photos))}
                         {update.photos.map((photo, photoIndex) => {
-                          console.log('Processing photo:', photo);
                           if (!photo || !photo.id || !photo.uri) {
-                            console.log('Invalid photo data at index', photoIndex);
                             return null;
                           }
                           return (
@@ -421,8 +392,8 @@ export default function IssueDetailScreen() {
             });
           }}
         >
-          <IconSymbol size={28} name="pencil-circle" color="#2563EB" />
-          <ThemedText style={[styles.buttonText, { color: '#2563EB', marginTop: 2 }]}>Update</ThemedText>
+          <IconSymbol size={28} name="pencil-circle" color="#FF5A1F" />
+          <ThemedText style={[styles.buttonText, { color: '#FF5A1F', marginTop: 2 }]}>Update</ThemedText>
         </Pressable>
         
         <Pressable
@@ -430,10 +401,10 @@ export default function IssueDetailScreen() {
             styles.actionButton,
             styles.deleteButton
           ]}
-          onPress={handleDeleteIssue}
+          onPress={() => router.navigate('/(tabs)/issues')}
         >
-          <IconSymbol size={28} name="delete-circle" color="#E11D48" />
-          <ThemedText style={[styles.buttonText, { color: '#E11D48', marginTop: 2 }]}>Delete</ThemedText>
+          <IconSymbol size={28} name="close-circle" color="#000000" />
+          <ThemedText style={[styles.buttonText, { color: '#000000', marginTop: 2 }]}>Cancel</ThemedText>
         </Pressable>
       </ThemedView>
     </ThemedView>

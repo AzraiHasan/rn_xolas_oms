@@ -124,7 +124,6 @@ export function PhotoGallery({ photos, title = 'Photos', onPhotoRemove }: PhotoG
                 onError={() => {
                   setIsLoading(false);
                   setError(true);
-                  console.error(`Failed to load image: ${photo.uri}`);
                 }}
               />
             )}
@@ -136,11 +135,9 @@ export function PhotoGallery({ photos, title = 'Photos', onPhotoRemove }: PhotoG
   
   // Simple grid layout to avoid FlatList nesting issues
   const renderSimpleGrid = () => {
-    console.log('PhotoGallery: onPhotoRemove available?', !!onPhotoRemove);
     return (
       <ThemedView className="flex-row flex-wrap">
         {photos.map((photo, index) => {
-          console.log(`Rendering photo ${photo.id} with delete handler: ${!!onPhotoRemove}`);
           return (
             <PhotoItem
               key={photo.id}

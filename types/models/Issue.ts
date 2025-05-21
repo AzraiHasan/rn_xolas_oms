@@ -9,6 +9,14 @@ export enum IssueSeverity {
   High = "High"
 }
 
+export enum IssueCategory {
+  Docket = "Docket",
+  Vandalism = "Vandalism",
+  Corrective = "Corrective",
+  Preventive = "Preventive",
+  Audit = "Audit"
+}
+
 export enum IssueStatus {
   New = "New",
   Assigned = "Assigned",
@@ -47,6 +55,8 @@ export interface IssueReport {
   id: string;
   /** Concise title describing the issue */
   title: string;
+  /** Issue category classification */
+  category: IssueCategory;
   /** Detailed description of the issue */
   description: string;
   /** Technician-reported location of the issue */

@@ -1,14 +1,13 @@
 import { Tabs } from 'expo-router';
+import React from 'react';
+import { Platform } from 'react-native';
 
 // Disallow access to test tab
 export const unstable_settings = {
   initialRouteName: 'index',
 };
-import React from 'react';
-import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
-import { AppHeader } from '@/components/layout/AppHeader';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
@@ -20,8 +19,8 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
+        tabBarActiveTintColor: '#FF5A1F', // Dark orange color
+        tabBarInactiveTintColor: '#000000', // Black color for inactive tabs
         headerShown: false,
         tabBarButton: props => <HapticTab {...props} />,
         tabBarBackground: () => <TabBarBackground />,

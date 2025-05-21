@@ -1,31 +1,18 @@
 import React from 'react';
-import { Dimensions } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { IssueSeverity } from '@/types/models/Issue';
 
 interface IssueBarChartProps {
-  data: Record<IssueSeverity, number>;
-  total: number;
+  // Empty props for now - we'll use different data later
 }
 
 /**
  * Component for visualizing issue statistics as a horizontal bar chart
  */
-export function IssueBarChart({ data, total }: IssueBarChartProps) {
+export function IssueBarChart({}: IssueBarChartProps) {
   const colorScheme = useColorScheme();
-  
-  // Calculate percentages for each severity
-  const getPercentage = (count: number): number => {
-    if (total === 0) return 0;
-    return (count / total) * 100;
-  };
-  
-  const highPercentage = getPercentage(data[IssueSeverity.High]);
-  const mediumPercentage = getPercentage(data[IssueSeverity.Medium]);
-  const lowPercentage = getPercentage(data[IssueSeverity.Low]);
   
   // Style values
   const barHeight = 28;
@@ -34,104 +21,90 @@ export function IssueBarChart({ data, total }: IssueBarChartProps) {
   
   return (
     <ThemedView 
-      className="rounded-xl p-4 mb-6 border-[1px] md:p-5 lg:p-6"
-      style={{ borderColor: colorScheme === 'dark' ? '#FFFFFF' : '#444444' }}
+      className="rounded-xl mb-6 w-full"
     >
-      <ThemedText type="defaultSemiBold" className="mb-4 md:text-lg">
-        Issue Breakdown
-      </ThemedText>
-      
       <ThemedView 
-        className="rounded-xl overflow-hidden p-4 mb-4"
+        className="rounded-xl overflow-hidden mb-4 w-full"
         style={{ backgroundColor: chartBackground }}
       >
-        {/* High Severity Bar */}
+        {/* Docket Bar */}
         <ThemedView className="mb-4">
           <ThemedView className="flex-row justify-between mb-2">
-            <ThemedText className="text-sm md:text-base font-bold">High</ThemedText>
+            <ThemedText className="text-sm md:text-base font-bold">Docket</ThemedText>
             <ThemedText className="text-sm md:text-base">
-              {data[IssueSeverity.High]} ({Math.round(highPercentage)}%)
+              0 (0%)
             </ThemedText>
           </ThemedView>
           <ThemedView 
             className="rounded-full overflow-hidden"
             style={{ height: barHeight, backgroundColor: barBackgroundColor }}
           >
-            <ThemedView 
-              className="rounded-full"
-              style={{
-                height: barHeight, 
-                width: `${highPercentage}%`, 
-                backgroundColor: '#E11D48',
-                minWidth: highPercentage > 0 ? 20 : 0,
-              }}
-            />
+            {/* Empty bar */}
           </ThemedView>
         </ThemedView>
         
-        {/* Medium Severity Bar */}
+        {/* Vandalism Bar */}
         <ThemedView className="mb-4">
           <ThemedView className="flex-row justify-between mb-2">
-            <ThemedText className="text-sm md:text-base font-bold">Medium</ThemedText>
+            <ThemedText className="text-sm md:text-base font-bold">Vandalism</ThemedText>
             <ThemedText className="text-sm md:text-base">
-              {data[IssueSeverity.Medium]} ({Math.round(mediumPercentage)}%)
+              0 (0%)
             </ThemedText>
           </ThemedView>
           <ThemedView 
             className="rounded-full overflow-hidden"
             style={{ height: barHeight, backgroundColor: barBackgroundColor }}
           >
-            <ThemedView 
-              className="rounded-full"
-              style={{
-                height: barHeight, 
-                width: `${mediumPercentage}%`, 
-                backgroundColor: '#F59E0B',
-                minWidth: mediumPercentage > 0 ? 20 : 0,
-              }}
-            />
+            {/* Empty bar */}
           </ThemedView>
         </ThemedView>
         
-        {/* Low Severity Bar */}
+        {/* Corrective Bar */}
+        <ThemedView className="mb-4">
+          <ThemedView className="flex-row justify-between mb-2">
+            <ThemedText className="text-sm md:text-base font-bold">Corrective</ThemedText>
+            <ThemedText className="text-sm md:text-base">
+              0 (0%)
+            </ThemedText>
+          </ThemedView>
+          <ThemedView 
+            className="rounded-full overflow-hidden"
+            style={{ height: barHeight, backgroundColor: barBackgroundColor }}
+          >
+            {/* Empty bar */}
+          </ThemedView>
+        </ThemedView>
+        
+        {/* Preventive Bar */}
+        <ThemedView className="mb-4">
+          <ThemedView className="flex-row justify-between mb-2">
+            <ThemedText className="text-sm md:text-base font-bold">Preventive</ThemedText>
+            <ThemedText className="text-sm md:text-base">
+              0 (0%)
+            </ThemedText>
+          </ThemedView>
+          <ThemedView 
+            className="rounded-full overflow-hidden"
+            style={{ height: barHeight, backgroundColor: barBackgroundColor }}
+          >
+            {/* Empty bar */}
+          </ThemedView>
+        </ThemedView>
+        
+        {/* Audit Bar */}
         <ThemedView>
           <ThemedView className="flex-row justify-between mb-2">
-            <ThemedText className="text-sm md:text-base font-bold">Low</ThemedText>
+            <ThemedText className="text-sm md:text-base font-bold">Audit</ThemedText>
             <ThemedText className="text-sm md:text-base">
-              {data[IssueSeverity.Low]} ({Math.round(lowPercentage)}%)
+              0 (0%)
             </ThemedText>
           </ThemedView>
           <ThemedView 
             className="rounded-full overflow-hidden"
             style={{ height: barHeight, backgroundColor: barBackgroundColor }}
           >
-            <ThemedView 
-              className="rounded-full"
-              style={{
-                height: barHeight, 
-                width: `${lowPercentage}%`, 
-                backgroundColor: '#10B981',
-                minWidth: lowPercentage > 0 ? 20 : 0,
-              }}
-            />
+            {/* Empty bar */}
           </ThemedView>
-        </ThemedView>
-      </ThemedView>
-      
-      <ThemedView className="flex-row flex-wrap justify-center gap-5 md:gap-6">
-        <ThemedView className="flex-row items-center">
-          <ThemedView className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-[#E11D48] mr-2" />
-          <ThemedText className="text-xs md:text-sm">High</ThemedText>
-        </ThemedView>
-        
-        <ThemedView className="flex-row items-center">
-          <ThemedView className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-[#F59E0B] mr-2" />
-          <ThemedText className="text-xs md:text-sm">Medium</ThemedText>
-        </ThemedView>
-        
-        <ThemedView className="flex-row items-center">
-          <ThemedView className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-[#10B981] mr-2" />
-          <ThemedText className="text-xs md:text-sm">Low</ThemedText>
         </ThemedView>
       </ThemedView>
     </ThemedView>

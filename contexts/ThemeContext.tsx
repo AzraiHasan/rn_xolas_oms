@@ -16,16 +16,14 @@ const THEME_PREFERENCE_KEY = '@theme_preference';
 const THEME_SYSTEM_DEFAULT_KEY = '@theme_system_default';
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const deviceColorScheme = useDeviceColorScheme() || 'light';
+  const deviceColorScheme = 'light'; // Force light mode
   const [colorScheme, setColorScheme] = useState<NonNullable<ColorSchemeName>>('light');
-  const [isSystemDefault, setIsSystemDefault] = useState(true);
+  const [isSystemDefault, setIsSystemDefault] = useState(false); // Disable system default
 
-  // Update color scheme when device theme changes and system default is enabled
+  // Always use light mode regardless of device settings
   useEffect(() => {
-    if (isSystemDefault) {
-      setColorScheme(deviceColorScheme);
-    }
-  }, [deviceColorScheme, isSystemDefault]);
+    setColorScheme('light');
+  }, []);
 
   const toggleColorScheme = () => {
     setColorScheme(prev => (prev === 'dark' ? 'light' : 'dark'));
