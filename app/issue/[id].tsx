@@ -2,13 +2,13 @@ import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Alert, Pressable, Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 
 import { PhotoGallery } from '@/components/photos';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { Header, PageLayout } from '@/components/layouts';
 import { Colors } from '@/constants/Colors';
 import { findSiteById } from '@/constants/Sites';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -22,7 +22,6 @@ export default function IssueDetailScreen() {
   const { id } = useLocalSearchParams();
   const issueId = typeof id === 'string' ? id : '';
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
@@ -196,29 +195,29 @@ export default function IssueDetailScreen() {
   // Render content based on state
   if (loading || issuesLoading) {
     return (
-      <ThemedView style={styles.container}>
-        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-        <ThemedView style={[styles.statusBarBackground, { height: insets.top }]} />
-        <ThemedView style={styles.loadingContainer}>
+      <PageLayout
+        header={<Header title="Issue Details" showBackButton={true} />}
+      >
+        <ThemedView className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={colors.tint} />
-          <ThemedText style={styles.loadingText}>Loading issue details...</ThemedText>
+          <ThemedText className="mt-4 text-base">Loading issue details...</ThemedText>
         </ThemedView>
-      </ThemedView>
+      </PageLayout>
     );
   }
   
   if (error || !issue) {
     return (
-      <ThemedView style={styles.container}>
-        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-        <ThemedView style={[styles.statusBarBackground, { height: insets.top }]} />
-        <ThemedView style={styles.errorContainer}>
+      <PageLayout
+        header={<Header title="Issue Details" showBackButton={true} />}
+      >
+        <ThemedView className="flex-1 items-center justify-center px-6">
           <IconSymbol 
             size={48} 
             name="exclamationmark.triangle.fill" 
             color="#E11D48" 
           />
-          <ThemedText style={styles.errorText}>{error || 'Issue not found'}</ThemedText>
+          <ThemedText className="text-red-600 text-base text-center my-4">{error || 'Issue not found'}</ThemedText>
           <Link href="/(tabs)/issues" asChild>
             <Pressable
               className="py-3 md:py-4 rounded-lg items-center justify-center mx-1 border"
@@ -234,31 +233,17 @@ export default function IssueDetailScreen() {
             </Pressable>
           </Link>
         </ThemedView>
-      </ThemedView>
+      </PageLayout>
     );
   }
   
   return (
-    <ThemedView style={styles.container}>
+    <PageLayout
+      header={<Header title="Issue Details" showBackButton={true} />}
+      disableSafeArea={true}
+      disableScrolling={true}
+    >
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-      
-      {/* Status Bar Background */}
-      <ThemedView style={[styles.statusBarBackground, { height: insets.top }]} />
-      
-      {/* Custom Header */}
-      <ThemedView style={styles.headerContainer}>
-        <Pressable 
-          onPress={() => router.back()} 
-          style={[styles.backButton, { 
-            backgroundColor: 'transparent',
-            borderWidth: 0
-          }]}
-        >
-          <IconSymbol name="chevron.left" size={24} color="#000000" />
-        </Pressable>
-        <ThemedText type="title" style={styles.headerTitle}>Issue Details</ThemedText>
-        <ThemedView style={styles.headerRight} />
-      </ThemedView>
       
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Issue Header */}
@@ -412,51 +397,18 @@ export default function IssueDetailScreen() {
             styles.actionButton,
             styles.deleteButton
           ]}
-          onPress={() => router.navigate('/(tabs)/issues')}
+          onPress={() => router.navigate('/(tabs)')}
         >
           <IconSymbol size={28} name="close-circle" color="#000000" />
           <ThemedText style={[styles.buttonText, { color: '#000000', marginTop: 2 }]}>Cancel</ThemedText>
         </Pressable>
       </ThemedView>
-    </ThemedView>
+    </PageLayout>
   );
 }
 
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  statusBarBackground: {
-    width: '100%',
-    backgroundColor: '#FFFFFF',
-    borderBottomColor: '#EEEEEE',
-    borderBottomWidth: 0,
-  },
-  headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    marginRight: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 18,
-  },
-  headerRight: {
-    width: 24, // To balance the layout
-  },
   scrollView: {
     flex: 1,
   },
@@ -551,27 +503,6 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 12,
     fontWeight: '600',
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-  },
-  errorContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-  errorText: {
-    color: '#E11D48',
-    fontSize: 16,
-    textAlign: 'center',
-    marginVertical: 16,
   },
   updateContainer: {
     marginTop: 16,
