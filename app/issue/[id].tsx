@@ -10,6 +10,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
+import { findSiteById } from '@/constants/Sites';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useIssues } from '@/contexts/IssueContext';
 import { IssueReport, IssueSeverity } from '@/types/models/Issue';
@@ -36,6 +37,9 @@ export default function IssueDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [issue, setIssue] = useState<IssueReport | null>(null);
+  
+  // Get site information
+  const siteInfo = issue ? findSiteById(issue.siteId) : null;
   
   // Fetch issue data from context
   useEffect(() => {
@@ -260,27 +264,34 @@ export default function IssueDetailScreen() {
         {/* Issue Header */}
         <ThemedView style={styles.issueHeader}>
           <ThemedText type="title" style={styles.title}>{issue.title}</ThemedText>
-        </ThemedView>
-        
-        {/* Meta Information */}
-        <ThemedView style={styles.metaContainer}>
-          <ThemedView style={styles.metaItem}>
-            <IconSymbol size={16} name="mappin.circle.fill" color={colors.icon} />
-            <ThemedText style={styles.metaText}>{issue.location}</ThemedText>
-          </ThemedView>
-          
-          <ThemedView style={styles.metaItem}>
-            <IconSymbol size={16} name="calendar" color={colors.icon} />
-            <ThemedText style={styles.metaText}>{formatTimestamp(issue.timestamp)}</ThemedText>
-          </ThemedView>
-          
-          <ThemedView className="mr-4"></ThemedView>
-          
           <ThemedView style={[
             styles.severityBadge, 
             { backgroundColor: getSeverityColor(issue.severity) }
           ]}>
             <ThemedText style={[styles.severityText, { color: '#FFFFFF' }]}>{issue.severity}</ThemedText>
+          </ThemedView>
+        </ThemedView>
+        
+        {/* Meta Information */}
+        <ThemedView style={styles.metaContainer}>
+          <ThemedView style={[styles.metaItem, { width: '100%' }]}>
+            <IconSymbol size={16} name="folder.fill" color={colors.icon} />
+            <ThemedText style={styles.metaText}>{issue.category}</ThemedText>
+          </ThemedView>
+          
+          <ThemedView style={styles.metaItem}>
+            <IconSymbol size={16} name="mappin.circle.fill" color={colors.icon} />
+            <ThemedText style={styles.metaText}>{siteInfo?.siteName || 'Unknown Site'}</ThemedText>
+          </ThemedView>
+          
+          <ThemedView style={styles.metaItem}>
+            <IconSymbol size={16} name="checkmark.circle.fill" color={colors.icon} />
+            <ThemedText style={styles.metaText}>{siteInfo?.status || 'Unknown Status'}</ThemedText>
+          </ThemedView>
+          
+          <ThemedView style={styles.metaItem}>
+            <IconSymbol size={16} name="calendar" color={colors.icon} />
+            <ThemedText style={styles.metaText}>{formatTimestamp(issue.timestamp)}</ThemedText>
           </ThemedView>
           
           <ThemedView style={styles.metaItem}>
@@ -457,6 +468,7 @@ const styles = StyleSheet.create({
   issueHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    justifyContent: 'space-between',
     marginBottom: 12,
   },
   severityIndicator: {

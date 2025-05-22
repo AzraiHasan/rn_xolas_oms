@@ -7,6 +7,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
+import { findSiteById } from '@/constants/Sites';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { IssueReport, IssueSeverity } from '@/types/models/Issue';
 
@@ -21,6 +22,9 @@ interface RecentActivityItemProps {
 export function RecentActivityItem({ issue, style }: RecentActivityItemProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
+  
+  // Get site information
+  const siteInfo = findSiteById(issue.siteId);
   
   // Format timestamp to a readable relative time
   const getRelativeTime = (timestamp: string): string => {
@@ -95,13 +99,33 @@ export function RecentActivityItem({ issue, style }: RecentActivityItemProps) {
             </ThemedView>
             
             <ThemedView className="flex-row flex-wrap">
+              <ThemedView className="flex-row items-center mr-3 mb-1 w-full">
+                <IconSymbol name="folder.fill" size={12} color={colors.icon} />
+                <ThemedText 
+                  numberOfLines={1}
+                  className="text-xs ml-1"
+                >
+                  {issue.category}
+                </ThemedText>
+              </ThemedView>
+              
               <ThemedView className="flex-row items-center mr-3 mb-1">
                 <IconSymbol name="mappin.circle.fill" size={12} color={colors.icon} />
                 <ThemedText 
                   numberOfLines={1}
                   className="text-xs ml-1"
                 >
-                  {issue.location}
+                  {siteInfo?.siteName || 'Unknown Site'}
+                </ThemedText>
+              </ThemedView>
+              
+              <ThemedView className="flex-row items-center mr-3 mb-1">
+                <IconSymbol name="checkmark.circle.fill" size={12} color={colors.icon} />
+                <ThemedText 
+                  numberOfLines={1}
+                  className="text-xs ml-1"
+                >
+                  {siteInfo?.status || 'Unknown Status'}
                 </ThemedText>
               </ThemedView>
               

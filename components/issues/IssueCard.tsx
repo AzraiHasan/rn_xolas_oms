@@ -7,6 +7,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
+import { findSiteById } from '@/constants/Sites';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { IssueReport, IssueSeverity, IssueStatus } from '@/types/models/Issue';
 
@@ -33,6 +34,29 @@ export interface IssueCardProps {
 export function IssueCard({ issue, style, onPress }: IssueCardProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
+  
+  // Get site information
+  const siteInfo = findSiteById(issue.siteId);
+  
+  // Format timestamp to a readable relative time
+  const getRelativeTime = (timestamp: string): string => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) {
+      return 'Just now';
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60);
+      return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600);
+      return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+    } else {
+      const days = Math.floor(diffInSeconds / 86400);
+      return `${days} ${days === 1 ? 'day' : 'days'} ago`;
+    }
+  };
   
   const getSeverityColor = () => {
     switch (issue.severity) {
@@ -90,16 +114,30 @@ export function IssueCard({ issue, style, onPress }: IssueCardProps) {
         </ThemedView>
         
         <ThemedView className="flex-row flex-wrap">
+          <ThemedView className="flex-row items-center mr-3 mb-1 w-full">
+            <IconSymbol size={14} name="folder.fill" color={colors.icon} />
+            <ThemedText className="text-xs ml-1" numberOfLines={1}>
+              {issue.category}
+            </ThemedText>
+          </ThemedView>
+          
           <ThemedView className="flex-row items-center mr-3 mb-1">
             <IconSymbol size={14} name="mappin.circle.fill" color={colors.icon} />
             <ThemedText className="text-xs ml-1" numberOfLines={1}>
-              {issue.location}
+              {siteInfo?.siteName || 'Unknown Site'}
+            </ThemedText>
+          </ThemedView>
+          
+          <ThemedView className="flex-row items-center mr-3 mb-1">
+            <IconSymbol size={14} name="checkmark.circle.fill" color={colors.icon} />
+            <ThemedText className="text-xs ml-1" numberOfLines={1}>
+              {siteInfo?.status || 'Unknown Status'}
             </ThemedText>
           </ThemedView>
           
           <ThemedView className="flex-row items-center mr-3 mb-1">
             <IconSymbol size={14} name="calendar-month" color={colors.icon} />
-            <ThemedText className="text-xs ml-1">{formattedDate}</ThemedText>
+            <ThemedText className="text-xs ml-1">{getRelativeTime(issue.timestamp)}</ThemedText>
           </ThemedView>
           
           <ThemedView className="flex-row items-center mr-3 mb-1">

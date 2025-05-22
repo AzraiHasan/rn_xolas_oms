@@ -12,6 +12,7 @@ import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useForm } from '@/hooks/forms/useForm';
 import { IssueReportInput, IssueSeverity, IssueStatus, IssueCategory, Photo } from '@/types/models/Issue';
+import { getSiteOptions } from '@/constants/Sites';
 import { requiredValidator, minLengthValidator } from '@/utils/validation';
 import { useIssues } from '@/contexts/IssueContext';
 import { ValidationRule } from '@/utils/validation';
@@ -45,8 +46,8 @@ export default function CreateIssueScreen() {
     initialValues: {
       title: '',
       category: IssueCategory.Docket,
+      siteId: '',
       description: '',
-      location: '',
       severity: IssueSeverity.Medium,
       status: IssueStatus.New,
       photos: [],
@@ -60,12 +61,12 @@ export default function CreateIssueScreen() {
       category: [
         safeRequiredValidator
       ],
+      siteId: [
+        safeRequiredValidator
+      ],
       description: [
         safeRequiredValidator,
         safeMinLengthValidator(10)
-      ],
-      location: [
-        safeRequiredValidator
       ]
     },
     onSubmit: async (formValues) => {
@@ -141,7 +142,8 @@ export default function CreateIssueScreen() {
       disableSafeArea={true}
     >
       <Stack.Screen options={{ 
-        headerShown: false
+        headerShown: false,
+        tabBarStyle: { display: 'none' }
         // Tab bar styling handled by layout
       }} />
       
@@ -176,8 +178,19 @@ export default function CreateIssueScreen() {
             { value: IssueCategory.Audit, label: 'Audit' }
           ]}
           onChange={(category) => handleChangeValue('category', category)}
-          isError={false}
-          error={undefined}
+          isError={!!errors.category}
+          error={errors.category}
+        />
+
+        <DropdownField
+          label="Site"
+          required
+          placeholder="Select a site"
+          value={values.siteId || ''}
+          options={getSiteOptions()}
+          onChange={(siteId) => handleChangeValue('siteId', siteId)}
+          isError={!!errors.siteId}
+          error={errors.siteId}
         />
 
         <TextAreaField
@@ -192,19 +205,6 @@ export default function CreateIssueScreen() {
           isError={!!errors.description}
           validationRules={[requiredValidator, minLengthValidator(10)]}
           numberOfLines={4}
-        />
-
-        <FormField
-          name="location"
-          label="Location"
-          required
-          placeholder="Enter issue location"
-          value={values.location || ''}
-          onChangeValue={handleChangeValue}
-          onBlur={() => handleBlur('location')}
-          error={errors.location}
-          isError={!!errors.location}
-          validationRules={[requiredValidator]}
         />
 
         <SeveritySelector

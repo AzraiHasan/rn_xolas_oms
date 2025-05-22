@@ -59,8 +59,8 @@ export interface IssueReport {
   category: IssueCategory;
   /** Detailed description of the issue */
   description: string;
-  /** Technician-reported location of the issue */
-  location: string;
+  /** Site where the issue was reported */
+  siteId: string;
   /** Timestamp when the issue was reported */
   timestamp: string;
   /** Issue criticality classification */
