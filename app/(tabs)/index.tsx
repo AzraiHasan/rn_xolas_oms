@@ -47,7 +47,7 @@ export default function HomeScreen() {
           [IssueStatus.InProgress]: 0,
           [IssueStatus.Resolved]: 0,
         },
-        recentIssues: []
+        recentActivities: []
       };
     }
     
@@ -66,16 +66,47 @@ export default function HomeScreen() {
       [IssueStatus.Resolved]: issues.filter(i => i.status === IssueStatus.Resolved).length,
     };
     
-    // Get 5 most recent issues
-    const recentIssues = [...issues]
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-      .slice(0, 5);
+    // Get combined list of recent issues and updates
+    const getRecentActivities = () => {
+      const activities = [];
+      
+      // Add original issues as activities
+      issues.forEach(issue => {
+        activities.push({
+          type: 'new',
+          issue: issue,
+          timestamp: issue.timestamp
+        });
+        
+        // Add updates as activities
+        if (issue.updates && Array.isArray(issue.updates) && issue.updates.length > 0) {
+          issue.updates.forEach(update => {
+            if (update && update.timestamp) {
+              activities.push({
+                type: 'update',
+                issue: issue,
+                update: update,
+                timestamp: update.timestamp
+              });
+            }
+          });
+        }
+      });
+      
+      // Sort by timestamp (most recent first)
+      activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      
+      // Return the 5 most recent activities
+      return activities.slice(0, 5);
+    };
+    
+    const recentActivities = getRecentActivities();
     
     return {
       total: issues.length,
       bySeverity,
       byStatus,
-      recentIssues
+      recentActivities
     };
   };
   
@@ -236,15 +267,34 @@ export default function HomeScreen() {
             </Link>
           </ThemedView>
           
-          {stats.recentIssues.length > 0 ? (
+          {stats.recentActivities.length > 0 ? (
             <ThemedView className="border border-[#E4E7EB] dark:border-gray-700 rounded-xl overflow-hidden">
-              {stats.recentIssues.map((issue, index) => (
-                <RecentActivityItem 
-                  key={issue.id} 
-                  issue={issue} 
-                  style={index === stats.recentIssues.length - 1 ? { borderBottomWidth: 0 } : undefined}
-                />
-              ))}
+              {stats.recentActivities.map((activity, index) => {
+                // For 'new' type activities
+                if (activity.type === 'new') {
+                  return (
+                    <RecentActivityItem 
+                      key={`new-${activity.issue.id}`}
+                      issue={activity.issue}
+                      activityType="new"
+                      style={index === stats.recentActivities.length - 1 ? { borderBottomWidth: 0 } : undefined}
+                    />
+                  );
+                }
+                // For 'update' type activities
+                else if (activity.type === 'update') {
+                  return (
+                    <RecentActivityItem 
+                      key={`update-${activity.issue.id}-${activity.timestamp}`}
+                      issue={activity.issue}
+                      activityType="update"
+                      update={activity.update}
+                      style={index === stats.recentActivities.length - 1 ? { borderBottomWidth: 0 } : undefined}
+                    />
+                  );
+                }
+                return null;
+              })}
             </ThemedView>
           ) : (
             <ThemedView className="items-center justify-center py-8 border border-[#E4E7EB] dark:border-gray-700 rounded-xl mt-3">

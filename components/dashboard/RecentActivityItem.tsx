@@ -14,12 +14,14 @@ import { IssueReport, IssueSeverity } from '@/types/models/Issue';
 interface RecentActivityItemProps {
   issue: IssueReport;
   style?: StyleProp<ViewStyle>;
+  activityType: 'new' | 'update';
+  update?: any; // The update object if activityType is 'update'
 }
 
 /**
  * Component displaying a recent activity item for the dashboard
  */
-export function RecentActivityItem({ issue, style }: RecentActivityItemProps) {
+export function RecentActivityItem({ issue, style, activityType, update }: RecentActivityItemProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   
@@ -130,19 +132,18 @@ export function RecentActivityItem({ issue, style }: RecentActivityItemProps) {
               </ThemedView>
               
               <ThemedView className="flex-row items-center mr-3 mb-1">
-                <IconSymbol name="calendar-month" size={12} color={colors.icon} />
+                <IconSymbol name="calendar" size={12} color={colors.icon} />
                 <ThemedText className="text-xs ml-1">
-                  {getRelativeTime(issue.timestamp)}
+                  {activityType === 'update' && update ? getRelativeTime(update.timestamp) : getRelativeTime(issue.timestamp)}
                 </ThemedText>
               </ThemedView>
               
               <ThemedView className="flex-row items-center mr-3 mb-1">
                 <IconSymbol name="chart-bar" size={12} color={colors.icon} />
                 <ThemedText className="text-xs ml-1">
-                  {/* Show status history if exists, otherwise just current status */}
-                  {issue.updates && issue.updates.length > 0 ? 
-                  `${issue.updates[issue.updates.length - 1].previousStatus} → ${issue.status}` : 
-                  issue.status
+                  {activityType === 'update' && update && update.previousStatus && update.newStatus ?
+                    `${update.previousStatus} → ${update.newStatus}` :
+                    issue.status
                   }
                 </ThemedText>
               </ThemedView>
