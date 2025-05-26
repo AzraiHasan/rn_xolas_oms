@@ -225,7 +225,7 @@ export function PhotoGallery({ photos, title = 'Photos', onPhotoRemove }: PhotoG
   };
 
   return (
-    <ThemedView className="mb-6">
+    <ThemedView className="mb-0">
       {title && <ThemedText type="subtitle" className="mb-4">{title} ({photos.length})</ThemedText>}
       
       <ThemedView style={{minHeight: photos.length > 0 ? 200 : 'auto', maxHeight: 320}}>

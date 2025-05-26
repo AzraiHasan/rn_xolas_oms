@@ -300,7 +300,7 @@ export default function IssueDetailScreen() {
         </ThemedView>
         
         {/* Photos Section */}
-        <ThemedView style={[styles.sectionContainer, { marginBottom: 12 }]}>
+        <ThemedView style={[styles.sectionContainer, { marginBottom: 0 }]}>
           <PhotoGallery 
             photos={issue.photos.filter(photo => {
               // Filter out photos that appear in updates
@@ -325,7 +325,7 @@ export default function IssueDetailScreen() {
 
         {/* Update History Section */}
         {issue.updates && issue.updates.length > 0 && (
-          <ThemedView style={[styles.sectionContainer, { marginTop: 0 }]}>
+          <ThemedView style={[styles.sectionContainer, { marginTop: -30 }]}>
             <ThemedText type="subtitle">Update History</ThemedText>
             {issue.updates.map((update, index) => {
               // Skip if update is not a valid object
