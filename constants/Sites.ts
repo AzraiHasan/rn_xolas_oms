@@ -1,138 +1,228 @@
 import { Site, SiteStatus, SiteOption } from '@/types/models/Site';
 
 /**
- * Mock site data for Johor Bahru shopping malls
+ * Mock site data with diverse statuses from various locations
  */
 export const MOCK_SITES: Site[] = [
   {
-    "siteId": "JBMALL01",
-    "siteName": "Johor Bahru City Square",
+    "siteId": "JDC0849LSR130DNB",
+    "siteName": "IWK NUSA BESTARI 2",
     "siteAddress": {
-      "street": "106-108, Jalan Wong Ah Fook",
-      "latitude": 1.4622,
-      "longitude": 103.7639,
-      "city": "Johor Bahru",
-      "state": "Johor",
-      "country": "Malaysia"
+      "street": "Jalan Nusa Bestari, Taman Nusa Bestari",
+      "latitude": 1.492282,
+      "longitude": 103.64925
     },
-    "status": SiteStatus.Active
+    "status": SiteStatus.Active,
+    "group": ""
   },
   {
-    "siteId": "JBMALL02",
-    "siteName": "KSL City Mall",
+    "siteId": "JDC0673TW160",
+    "siteName": "KAMPUNG PAYA MENGKUANG",
     "siteAddress": {
-      "street": "33, Jalan Seladang, Taman Abad",
-      "latitude": 1.4825,
-      "longitude": 103.7609,
-      "city": "Johor Bahru",
-      "state": "Johor",
-      "country": "Malaysia"
+      "street": "Kampung Paya Mengkuang",
+      "latitude": 1.370325,
+      "longitude": 103.584875
     },
-    "status": SiteStatus.Active
+    "status": SiteStatus.Active,
+    "group": ""
   },
   {
-    "siteId": "JBMALL03",
-    "siteName": "Paradigm Mall Johor Bahru",
+    "siteId": "JDA0256LP130",
+    "siteName": "TAMAN REDANG",
     "siteAddress": {
-      "street": "Jalan Skudai",
-      "latitude": 1.5104,
-      "longitude": 103.6931,
-      "city": "Johor Bahru",
-      "state": "Johor",
-      "country": "Malaysia"
+      "street": "Taman Redang",
+      "latitude": 1.5141,
+      "longitude": 103.79287
     },
-    "status": SiteStatus.Active
+    "status": SiteStatus.Active,
+    "group": ""
   },
   {
-    "siteId": "JBMALL04",
-    "siteName": "AEON Mall Tebrau City",
+    "siteId": "JDA0257MR124",
+    "siteName": "SURAU AUSTIN PERDANA",
     "siteAddress": {
-      "street": "No 1, Jalan Desa Tebrau, Taman Desa Tebrau",
-      "latitude": 1.5499,
-      "longitude": 103.7957,
-      "city": "Johor Bahru",
-      "state": "Johor",
-      "country": "Malaysia"
+      "street": "Surau Austin Perdana",
+      "latitude": 1.54184,
+      "longitude": 103.78392
     },
-    "status": SiteStatus.Support
+    "status": SiteStatus.Active,
+    "group": ""
   },
   {
-    "siteId": "JBMALL05",
-    "siteName": "The Mall, Mid Valley Southkey",
+    "siteId": "JDC0491MPT145",
+    "siteName": "LEISURE FARM (GATE 4)",
     "siteAddress": {
-      "street": "No. 1, Persiaran Southkey 1, Kota Southkey",
-      "latitude": 1.4886,
-      "longitude": 103.7736,
-      "city": "Johor Bahru",
-      "state": "Johor",
-      "country": "Malaysia"
+      "street": "Leisure Farm Gate 4",
+      "latitude": 1.404925,
+      "longitude": 103.614657
     },
-    "status": SiteStatus.Active
+    "status": SiteStatus.Active,
+    "group": ""
   },
   {
-    "siteId": "JBMALL06",
-    "siteName": "Toppen Shopping Centre",
+    "siteId": "JDN0674SQ130D",
+    "siteName": "MASJID JAMEK CHAAH",
     "siteAddress": {
-      "street": "No. 33A, Jalan Harmonium, Taman Desa Tebrau",
-      "latitude": 1.5535,
-      "longitude": 103.7971,
-      "city": "Johor Bahru",
-      "state": "Johor",
-      "country": "Malaysia"
+      "street": "Masjid Jamek Chaah",
+      "latitude": 2.24887,
+      "longitude": 103.039568
     },
-    "status": SiteStatus.Active
+    "status": SiteStatus.Active,
+    "group": ""
   },
   {
-    "siteId": "JBMALL07",
-    "siteName": "AEON Mall Bukit Indah",
+    "siteId": "JDR0905LSR130D",
+    "siteName": "PERINDUSTRIAN BAKRI MUAR",
     "siteAddress": {
-      "street": "8, Jalan Indah 15/2, Taman Bukit Indah",
-      "latitude": 1.4820,
-      "longitude": 103.6550,
-      "city": "Johor Bahru",
-      "state": "Johor",
-      "country": "Malaysia"
+      "street": "Kawasan Perindustrian Bakri",
+      "latitude": 2.019363,
+      "longitude": 102.667949
     },
-    "status": SiteStatus.NotActive
+    "status": SiteStatus.Active,
+    "group": ""
   },
   {
-    "siteId": "JBMALL08",
-    "siteName": "R&F Mall Johor Bahru",
+    "siteId": "JDB0260LP130",
+    "siteName": "TAMAN CAHAYA MASAI 3 LP",
     "siteAddress": {
-      "street": "Jalan Tanjung Puteri, R&F, Tanjung Puteri",
-      "latitude": 1.4603,
-      "longitude": 103.7718,
-      "city": "Johor Bahru",
-      "state": "Johor",
-      "country": "Malaysia"
+      "street": "Taman Cahaya Masai 3",
+      "latitude": 1.50598,
+      "longitude": 103.93228
     },
-    "status": SiteStatus.Active
+    "status": SiteStatus.Active,
+    "group": ""
   },
   {
-    "siteId": "JBMALL09",
-    "siteName": "Sunway Big Box Retail Park",
+    "siteId": "JDK0493PR126",
+    "siteName": "PERKIM, BATU PAHAT",
     "siteAddress": {
-      "street": "Pusat Komersial Sunway Marketplace, Persiaran Medini 5, Sunway City Iskandar Puteri",
-      "latitude": 1.4209,
-      "longitude": 103.6372,
-      "city": "Iskandar Puteri",
-      "state": "Johor",
-      "country": "Malaysia"
+      "street": "PERKIM, Batu Pahat",
+      "latitude": 1.840995,
+      "longitude": 102.933589
     },
-    "status": SiteStatus.Support
+    "status": SiteStatus.Active,
+    "group": ""
   },
   {
-    "siteId": "JBMALL10",
-    "siteName": "Plaza Angsana",
+    "siteId": "JDS0910LSR130D",
+    "siteName": "KM 57 SDE (KIM LOONG PLANTATION)",
     "siteAddress": {
-      "street": "Pusat Bandar Tampoi, 5, Jalan Tampoi",
-      "latitude": 1.5051,
-      "longitude": 103.7093,
-      "city": "Johor Bahru",
-      "state": "Johor",
-      "country": "Malaysia"
+      "street": "KM 57 SDE, Kim Loong Plantation",
+      "latitude": 1.548522,
+      "longitude": 104.096874
     },
-    "status": SiteStatus.Active
+    "status": SiteStatus.Active,
+    "group": ""
+  },
+  {
+    "siteId": "J10D",
+    "siteName": "T1 SAJ Bukit Skudai",
+    "siteAddress": {
+      "street": "SAJ Bukit Skudai",
+      "latitude": 1.541347,
+      "longitude": 103.676351
+    },
+    "status": SiteStatus.Dismantled,
+    "group": ""
+  },
+  {
+    "siteId": "LR047",
+    "siteName": "RAPID LOT 42, Pengerang",
+    "siteAddress": {
+      "street": "Rapid Lot 42, Pengerang",
+      "latitude": 1.370306,
+      "longitude": 104.1772
+    },
+    "status": SiteStatus.Dismantled,
+    "group": ""
+  },
+  {
+    "siteId": "J325D",
+    "siteName": "Taman Sierra Perdana LP2",
+    "siteAddress": {
+      "street": "Taman Sierra Perdana",
+      "latitude": 1.476258,
+      "longitude": 103.872919
+    },
+    "status": SiteStatus.Dismantled,
+    "group": ""
+  },
+  {
+    "siteId": "J191D",
+    "siteName": "Horizon Hill",
+    "siteAddress": {
+      "street": "Horizon Hill",
+      "latitude": 1.460989,
+      "longitude": 103.654522
+    },
+    "status": SiteStatus.Dismantled,
+    "group": ""
+  },
+  {
+    "siteId": "J01368",
+    "siteName": "T3 FELCRA BKT KEPONG",
+    "siteAddress": {
+      "street": "FELCRA Bukit Kepong",
+      "latitude": 0,
+      "longitude": 0
+    },
+    "status": SiteStatus.Candidate,
+    "group": ""
+  },
+  {
+    "siteId": "LR005",
+    "siteName": "JBA Larkin",
+    "siteAddress": {
+      "street": "JBA Larkin",
+      "latitude": 1.497586,
+      "longitude": 103.7255728
+    },
+    "status": SiteStatus.NotActive,
+    "group": ""
+  },
+  {
+    "siteId": "LR075",
+    "siteName": "Kampung Tengah Renggam",
+    "siteAddress": {
+      "street": "Kampung Tengah Renggam",
+      "latitude": 1.84437,
+      "longitude": 103.41088
+    },
+    "status": SiteStatus.NotActive,
+    "group": ""
+  },
+  {
+    "siteId": "LR082",
+    "siteName": "Ladang Kekayaan",
+    "siteAddress": {
+      "street": "Ladang Kekayaan",
+      "latitude": 2.19569,
+      "longitude": 103.28526
+    },
+    "status": SiteStatus.NotActive,
+    "group": ""
+  },
+  {
+    "siteId": "JDC0254MP145",
+    "siteName": "Felda Ulu Tebrau",
+    "siteAddress": {
+      "street": "Felda Ulu Tebrau",
+      "latitude": 1.63431,
+      "longitude": 103.76186
+    },
+    "status": SiteStatus.Support,
+    "group": "LIMITLESS"
+  },
+  {
+    "siteId": "JDH0255TW145",
+    "siteName": "GE Kota Tinggi",
+    "siteAddress": {
+      "street": "GE Kota Tinggi",
+      "latitude": 1.75601,
+      "longitude": 103.88677
+    },
+    "status": SiteStatus.Support,
+    "group": "LIMITLESS"
   }
 ];
 

@@ -17,6 +17,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { useSyncContext } from '@/contexts/SyncContext';
 import { useIssues } from '@/contexts/IssueContext';
 import { IssueReport, IssueSeverity } from '@/types/models/Issue';
+import { findSiteById } from '@/constants/Sites';
 
 interface IssueDetailScreenProps {
   issueId: string;
@@ -195,6 +196,18 @@ export function IssueDetailScreen({ issueId }: IssueDetailScreenProps) {
         
         {/* Meta Information */}
         <ThemedView style={styles.metaContainer}>
+          {/* Category */}
+          <ThemedView style={styles.metaItem}>
+            <IconSymbol size={16} name="folder.fill" color={colors.icon} />
+            <ThemedText style={styles.metaText}>{issue.category}</ThemedText>
+          </ThemedView>
+
+          {/* Site ID */}
+          <ThemedView style={styles.metaItem}>
+            <IconSymbol size={16} name="building.2.fill" color={colors.icon} />
+            <ThemedText style={styles.metaText}>{issue.siteId}</ThemedText>
+          </ThemedView>
+          
           <ThemedView style={styles.metaItem}>
             <IconSymbol size={16} name="mappin.circle.fill" color={colors.icon} />
             <ThemedText style={styles.metaText}>{issue.location}</ThemedText>

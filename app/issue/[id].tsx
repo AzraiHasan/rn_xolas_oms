@@ -1,8 +1,9 @@
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Alert, Pressable, Platform } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Alert, Pressable, Platform, Modal, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { PhotoGallery } from '@/components/photos';
 import { ThemedText } from '@/components/ThemedText';
@@ -13,7 +14,7 @@ import { Colors } from '@/constants/Colors';
 import { findSiteById } from '@/constants/Sites';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useIssues } from '@/contexts/IssueContext';
-import { IssueReport, IssueSeverity } from '@/types/models/Issue';
+import { IssueReport, IssueSeverity, Photo } from '@/types/models/Issue';
 
 /**
  * Enhanced issue detail screen with photo gallery
@@ -36,6 +37,8 @@ export default function IssueDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [issue, setIssue] = useState<IssueReport | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [photoModalVisible, setPhotoModalVisible] = useState(false);
   
   // Get site information
   const siteInfo = issue ? findSiteById(issue.siteId) : null;
@@ -264,6 +267,11 @@ export default function IssueDetailScreen() {
             <ThemedText style={styles.metaText}>{issue.category}</ThemedText>
           </ThemedView>
           
+          <ThemedView style={[styles.metaItem, { width: '100%' }]}>
+            <MaterialCommunityIcons name="antenna" size={16} color={colors.icon} />
+            <ThemedText style={styles.metaText}>{issue.siteId}</ThemedText>
+          </ThemedView>
+          
           <ThemedView style={styles.metaItem}>
             <IconSymbol size={16} name="mappin.circle.fill" color={colors.icon} />
             <ThemedText style={styles.metaText}>{siteInfo?.siteName || 'Unknown Site'}</ThemedText>
@@ -294,7 +302,22 @@ export default function IssueDetailScreen() {
         {/* Photos Section */}
         <ThemedView style={[styles.sectionContainer, { marginBottom: 12 }]}>
           <PhotoGallery 
-            photos={issue.photos} 
+            photos={issue.photos.filter(photo => {
+              // Filter out photos that appear in updates
+              if (!issue.updates || !Array.isArray(issue.updates)) return true;
+              
+              // Check if this photo appears in any update
+              for (const update of issue.updates) {
+                if (!update.photos || !Array.isArray(update.photos)) continue;
+                
+                // Look for matching photo ID
+                if (update.photos.some(updatePhoto => updatePhoto.id === photo.id)) {
+                  return false; // Filter out this photo
+                }
+              }
+              
+              return true; // Include photos not found in updates
+            })} 
             title="Photos" 
             onPhotoRemove={handleRemovePhoto}
           />
@@ -344,13 +367,20 @@ export default function IssueDetailScreen() {
                             return null;
                           }
                           return (
-                            <ThemedView key={photo.id} style={styles.photoThumbnailContainer}>
-                              <Image
-                                source={{ uri: photo.uri }}
-                                style={styles.photoThumbnail}
-                                contentFit="cover"
-                              />
-                            </ThemedView>
+                          <TouchableOpacity 
+                            key={photo.id} 
+                            style={styles.photoThumbnailContainer}
+                            onPress={() => {
+                              setSelectedPhoto(photo);
+                              setPhotoModalVisible(true);
+                            }}
+                          >
+                            <Image
+                              source={{ uri: photo.uri }}
+                              style={styles.photoThumbnail}
+                              contentFit="cover"
+                            />
+                          </TouchableOpacity>
                           );
                         })}
                       </ScrollView>
@@ -403,6 +433,35 @@ export default function IssueDetailScreen() {
           <ThemedText style={[styles.buttonText, { color: '#000000', marginTop: 2 }]}>Cancel</ThemedText>
         </Pressable>
       </ThemedView>
+      
+      {/* Photo Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={photoModalVisible}
+        onRequestClose={() => setPhotoModalVisible(false)}
+      >
+        <Pressable 
+          style={styles.photoModalContainer}
+          onPress={() => setPhotoModalVisible(false)}
+        >
+          <ThemedView style={styles.photoModalContent}>
+            {selectedPhoto && (
+              <Image
+                source={{ uri: selectedPhoto.uri }}
+                style={styles.photoModalImage}
+                contentFit="contain"
+              />
+            )}
+            <Pressable 
+              style={styles.photoModalCloseButton}
+              onPress={() => setPhotoModalVisible(false)}
+            >
+              <IconSymbol name="xmark" size={24} color="#FFFFFF" />
+            </Pressable>
+          </ThemedView>
+        </Pressable>
+      </Modal>
     </PageLayout>
   );
 }
@@ -415,7 +474,8 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     paddingBottom: 100, // Add extra padding for fixed buttons to match actionsContainer height
-    paddingTop: 0, // Reduced top padding since we have the header
+    paddingTop: 16, // Added padding at the top for spacing below header
+    marginTop: 8, // Extra margin between header and content
   },
   issueHeader: {
     flexDirection: 'row',
@@ -565,5 +625,30 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 8,
+  },
+  photoModalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  photoModalContent: {
+    width: '90%',
+    height: '80%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  photoModalImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+  },
+  photoModalCloseButton: {
+    position: 'absolute',
+    top: -40,
+    right: 0,
+    backgroundColor: 'transparent',
+    padding: 8,
   },
 });
