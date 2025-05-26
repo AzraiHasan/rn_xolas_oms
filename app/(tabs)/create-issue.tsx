@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, Pressable, Alert, Platform } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -35,13 +35,31 @@ export default function CreateIssueScreen() {
   const colors = Colors[colorScheme ?? 'light'];
   const router = useRouter();
   
+  // Create a function to fully reset the form
+  const fullResetForm = () => {
+    // Explicitly reset all form fields to initial values
+    handleChange('title', '');
+    handleChange('description', '');
+    handleChange('category', IssueCategory.Docket);
+    handleChange('siteId', '');
+    handleChange('severity', IssueSeverity.Medium);
+    handleChange('status', IssueStatus.New);
+    handleChange('photos', []);
+  };
+  
+  // Reset form when component mounts
+  useEffect(() => {
+    fullResetForm();
+  }, []);
+  
   const {
     values,
     errors,
     handleChange,
     handleBlur,
     handleSubmit,
-    validateForm
+    validateForm,
+    resetForm
   } = useForm<Partial<IssueReportInput>>({
     initialValues: {
       title: '',
@@ -82,17 +100,19 @@ export default function CreateIssueScreen() {
         // Create the issue using the context
         await createIssue(completeIssueInput);
         
-        // Show success message
+        // Reset form immediately after successful creation
+        resetForm();
+        
+        // Show success message briefly before redirecting
         Alert.alert(
           'Success',
-          'New issue created successfully',
-          [
-            {
-              text: 'OK',
-              onPress: () => router.navigate('/')
-            }
-          ]
+          'New issue created successfully'
         );
+        
+        // Automatically navigate to home after a brief delay
+        setTimeout(() => {
+          router.navigate('/');
+        }, 1500);
       } catch (error) {
         console.error('Failed to create issue:', error);
         Alert.alert(
