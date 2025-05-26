@@ -6,7 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import { Header, PageLayout } from '@/components/layouts';
-import { FormField, TextAreaField, SeveritySelector, DropdownField } from '@/components/forms';
+import { FormField, TextAreaField, SeveritySelector, DropdownField, SearchableSiteSelector } from '@/components/forms';
 import { PhotoPicker } from '@/components/photos/fixed/PhotoPicker';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -182,10 +182,10 @@ export default function CreateIssueScreen() {
           error={errors.category}
         />
 
-        <DropdownField
+        <SearchableSiteSelector
           label="Site"
           required
-          placeholder="Select a site"
+          placeholder="Search for a site"
           value={values.siteId || ''}
           options={getSiteOptions()}
           onChange={(siteId) => handleChangeValue('siteId', siteId)}
