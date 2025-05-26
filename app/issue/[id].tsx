@@ -324,10 +324,16 @@ export default function IssueDetailScreen() {
         </ThemedView>
 
         {/* Update History Section */}
-        {issue.updates && issue.updates.length > 0 && (
-          <ThemedView style={[styles.sectionContainer, { marginTop: -30 }]}>
-            <ThemedText type="subtitle">Update History</ThemedText>
-            {issue.updates.map((update, index) => {
+        <ThemedView style={[styles.sectionContainer, { marginTop: -30 }]}>
+          <ThemedText type="subtitle">Update History</ThemedText>
+          
+          {!issue.updates || issue.updates.length === 0 ? (
+            <ThemedView className="items-center justify-center p-6 border border-[#E4E7EB] dark:border-gray-700 border-dashed rounded-lg mt-4">
+              <IconSymbol name="history" size={24} color={colors.icon} />
+              <ThemedText className="mt-2 text-[#687076] dark:text-gray-400">No updates yet</ThemedText>
+            </ThemedView>
+          ) : (
+            issue.updates.map((update, index) => {
               // Skip if update is not a valid object
               if (!update || typeof update !== 'object') {
                 return null;
@@ -338,10 +344,6 @@ export default function IssueDetailScreen() {
               const description = update.description || 'No description';
               const previousStatus = update.previousStatus || 'Unknown';
               const newStatus = update.newStatus || 'Unknown';
-              
-              // Use empty array if photos is undefined
-              const photosArray = update.photos && Array.isArray(update.photos) ? update.photos : [];
-
               
               return (
                 <ThemedView key={index} style={[styles.updateContainer, darkContainerStyle]}>
@@ -367,20 +369,20 @@ export default function IssueDetailScreen() {
                             return null;
                           }
                           return (
-                          <TouchableOpacity 
-                            key={photo.id} 
-                            style={styles.photoThumbnailContainer}
-                            onPress={() => {
-                              setSelectedPhoto(photo);
-                              setPhotoModalVisible(true);
-                            }}
-                          >
-                            <Image
-                              source={{ uri: photo.uri }}
-                              style={styles.photoThumbnail}
-                              contentFit="cover"
-                            />
-                          </TouchableOpacity>
+                            <TouchableOpacity 
+                              key={photo.id} 
+                              style={styles.photoThumbnailContainer}
+                              onPress={() => {
+                                setSelectedPhoto(photo);
+                                setPhotoModalVisible(true);
+                              }}
+                            >
+                              <Image
+                                source={{ uri: photo.uri }}
+                                style={styles.photoThumbnail}
+                                contentFit="cover"
+                              />
+                            </TouchableOpacity>
                           );
                         })}
                       </ScrollView>
@@ -388,9 +390,9 @@ export default function IssueDetailScreen() {
                   )}
                 </ThemedView>
               );
-            })}
-          </ThemedView>
-        )}
+            })
+          )}
+        </ThemedView>
       </ScrollView>
       
       {/* Action Buttons - Fixed at bottom */}
