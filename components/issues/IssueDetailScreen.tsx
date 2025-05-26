@@ -210,7 +210,7 @@ export function IssueDetailScreen({ issueId }: IssueDetailScreenProps) {
           
           <ThemedView style={styles.metaItem}>
             <IconSymbol size={16} name="mappin.circle.fill" color={colors.icon} />
-            <ThemedText style={styles.metaText}>{issue.location}</ThemedText>
+            <ThemedText style={styles.metaText}>{findSiteById(issue.siteId)?.siteName || 'Unknown location'}</ThemedText>
           </ThemedView>
           
           <ThemedView style={styles.metaItem}>

@@ -143,8 +143,7 @@ export default function CreateIssueScreen() {
     >
       <Stack.Screen options={{ 
         headerShown: false,
-        tabBarStyle: { display: 'none' }
-        // Tab bar styling handled by layout
+        tabBarStyle: { display: 'none' } // Hide tab bar on this screen
       }} />
       
       <ScrollView 
@@ -287,6 +286,7 @@ export default function CreateIssueScreen() {
           </ThemedText>
         </Pressable>
       </ThemedView>
+
     </PageLayout>
   );
 }
