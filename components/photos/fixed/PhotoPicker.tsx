@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
+import { FullScreenCamera } from '@/components/photos/camera/FullScreenCamera';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Photo } from '@/types/models/Issue';
@@ -58,6 +59,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const [modalVisible, setModalVisible] = useState(false);
+  const [cameraVisible, setCameraVisible] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
   
   // Helper to generate a unique ID for photos
@@ -86,7 +88,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
     }
   };
   
-  // Take a new photo with the camera
+  // Take a new photo with the full-screen camera
   const takePhoto = async () => {
     const hasPermissions = await requestPermissions();
     if (!hasPermissions) return;
@@ -103,8 +105,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
     try {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ['images'],
-        allowsEditing: true,
-        aspect: [4, 3],
+        allowsEditing: false, // No editing for better compatibility
         quality: 0.8,
       });
       
@@ -120,6 +121,12 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
       console.error('Error taking photo:', error);
       Alert.alert('Error', 'Failed to take photo');
     }
+  };
+  
+  // Handle photo capture from full-screen camera
+  const handlePhotoCapture = (photo: Photo) => {
+    onPhotosChange([...photos, photo]);
+    setCameraVisible(false);
   };
   
   // Pick an existing photo from the gallery
@@ -185,24 +192,33 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
         {photos.length > 0 ? (
           <ThemedView>
             <FlatList
-              data={photos}
-              keyExtractor={(item) => item.id}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              renderItem={({ item, index }) => (
-                <Pressable 
-                  className="w-[120px] h-[120px] md:w-[150px] md:h-[150px] rounded-lg mr-2 mb-3 overflow-hidden relative" 
-                  onPress={() => viewPhoto(index)}
-                >
-                  <Image source={{ uri: item.uri }} className="w-full h-full" />
-                  <Pressable
-                    className="absolute top-1 right-1 z-10 bg-black/30 rounded-full"
-                    onPress={() => removePhoto(item.id)}
-                  >
-                    <Ionicons name="close-circle" size={24} color="#E11D48" />
+            data={photos}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item, index }) => (
+            <Pressable 
+            className="w-[120px] h-[120px] md:w-[150px] md:h-[150px] rounded-lg mr-2 mb-3 overflow-hidden relative" 
+            onPress={() => viewPhoto(index)}
+            >
+            <Image 
+            source={{ uri: item.uri }} 
+            style={{ width: '100%', height: '100%' }}
+            onError={(error) => {
+            console.log('Image load error:', error, 'URI:', item.uri);
+            }}
+            onLoad={() => {
+            console.log('Image loaded successfully:', item.uri);
+            }}
+            />
+                    <Pressable
+                      className="absolute top-1 right-1 z-10 bg-black/30 rounded-full"
+                      onPress={() => removePhoto(item.id)}
+                    >
+                      <Ionicons name="close-circle" size={24} color="#E11D48" />
+                    </Pressable>
                   </Pressable>
-                </Pressable>
-              )}
+                )}
             />
           </ThemedView>
         ) : null}
