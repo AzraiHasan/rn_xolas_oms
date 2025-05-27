@@ -9,6 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import * as MediaLibrary from 'expo-media-library';
 import { Ionicons } from '@expo/vector-icons';
 
 import { ThemedView } from '@/components/ThemedView';
@@ -71,8 +72,9 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
       if (Platform.OS !== 'web') {
         const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
         const { status: libraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const { status: mediaLibraryStatus } = await MediaLibrary.requestPermissionsAsync();
         
-        if (cameraStatus !== 'granted' || libraryStatus !== 'granted') {
+        if (cameraStatus !== 'granted' || libraryStatus !== 'granted' || mediaLibraryStatus !== 'granted') {
           Alert.alert(
             'Permissions Required',
             'Please grant camera and photo library permissions to use this feature',
@@ -149,13 +151,31 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.8,
+        exif: true, // Request EXIF data
       });
       
       if (!result.canceled && result.assets && result.assets.length > 0) {
+        // Get creation time from the media library
+        let timestamp = new Date().toISOString(); // Default to current time
+        
+        try {
+          // Create an asset from the selected image URI
+          const asset = await MediaLibrary.createAssetAsync(result.assets[0].uri);
+          
+          // If we have a creation time, use it
+          if (asset && asset.creationTime) {
+            timestamp = new Date(asset.creationTime).toISOString();
+            console.log('Using photo creation time:', timestamp);
+          }
+        } catch (mediaError) {
+          console.error('Error getting media asset details:', mediaError);
+          // Continue with current timestamp if media library fails
+        }
+        
         const newPhoto: Photo = {
           id: generatePhotoId(),
           uri: result.assets[0].uri,
-          timestamp: new Date().toISOString(),
+          timestamp: timestamp,
         };
         onPhotosChange([...photos, newPhoto]);
       }
@@ -270,11 +290,20 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
           </Pressable>
           
           {selectedPhotoIndex !== null && photos[selectedPhotoIndex] && (
-            <Image
-              source={{ uri: photos[selectedPhotoIndex].uri }}
-              className="w-full h-[80%]"
-              resizeMode="contain"
-            />
+            <View className="w-full h-[90%] items-center justify-center">
+              <Image
+                source={{ uri: photos[selectedPhotoIndex].uri }}
+                className="w-full h-[80%]"
+                resizeMode="contain"
+              />
+              {photos[selectedPhotoIndex].timestamp && (
+                <View className="absolute bottom-5 bg-black/50 px-4 py-2 rounded-lg">
+                  <ThemedText className="text-white text-sm">
+                    {new Date(photos[selectedPhotoIndex].timestamp).toLocaleString()}
+                  </ThemedText>
+                </View>
+              )}
+            </View>
           )}
         </View>
       </Modal>
