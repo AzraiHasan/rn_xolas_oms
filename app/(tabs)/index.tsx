@@ -66,34 +66,46 @@ export default function HomeScreen() {
       [IssueStatus.Resolved]: issues.filter(i => i.status === IssueStatus.Resolved).length,
     };
     
-    // Get combined list of recent issues and updates
+    // Get latest activity per issue (deduplicates by issue ID)
     const getRecentActivities = () => {
-      const activities = [];
+      const activitiesByIssue = new Map();
       
-      // Add original issues as activities
+      // For each issue, determine the latest activity
       issues.forEach(issue => {
-        activities.push({
-          type: 'new',
-          issue: issue,
-          timestamp: issue.timestamp
-        });
+        let latestActivity;
         
-        // Add updates as activities
+        // If issue has updates, use the most recent update
         if (issue.updates && Array.isArray(issue.updates) && issue.updates.length > 0) {
-          issue.updates.forEach(update => {
-            if (update && update.timestamp) {
-              activities.push({
-                type: 'update',
-                issue: issue,
-                update: update,
-                timestamp: update.timestamp
-              });
-            }
-          });
+          const validUpdates = issue.updates.filter(update => update && update.timestamp);
+          if (validUpdates.length > 0) {
+            // Sort updates by timestamp and get the most recent
+            const sortedUpdates = validUpdates.sort((a, b) => 
+              new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+            );
+            latestActivity = {
+              type: 'update',
+              issue: issue,
+              update: sortedUpdates[0],
+              timestamp: sortedUpdates[0].timestamp
+            };
+          }
         }
+        
+        // If no updates or no valid updates, use original issue creation
+        if (!latestActivity) {
+          latestActivity = {
+            type: 'new',
+            issue: issue,
+            timestamp: issue.timestamp
+          };
+        }
+        
+        // Store the latest activity for this issue
+        activitiesByIssue.set(issue.id, latestActivity);
       });
       
-      // Sort by timestamp (most recent first)
+      // Convert to array and sort by timestamp (most recent first)
+      const activities = Array.from(activitiesByIssue.values());
       activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       
       // Return the 5 most recent activities

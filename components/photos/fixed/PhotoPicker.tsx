@@ -106,7 +106,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
     
     try {
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ['images'],
+        mediaTypes: ImagePicker.MediaType.Images,
         allowsEditing: false,
         quality: 0.8,
       });
@@ -147,7 +147,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
     
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
+        mediaTypes: ImagePicker.MediaType.Images,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.8,

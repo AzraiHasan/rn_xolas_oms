@@ -300,7 +300,7 @@ export default function IssueDetailScreen() {
         </ThemedView>
         
         {/* Photos Section */}
-        <ThemedView style={[styles.sectionContainer, { marginBottom: 0 }]}>
+        <ThemedView style={styles.sectionContainer}>
           <PhotoGallery 
             photos={issue.photos.filter(photo => {
               // Filter out photos that appear in updates
@@ -324,7 +324,7 @@ export default function IssueDetailScreen() {
         </ThemedView>
 
         {/* Update History Section */}
-        <ThemedView style={[styles.sectionContainer, { marginTop: -30 }]}>
+        <ThemedView style={styles.sectionContainer}>
           <ThemedText type="subtitle">Update History</ThemedText>
           
           {!issue.updates || issue.updates.length === 0 ? (
@@ -448,13 +448,22 @@ export default function IssueDetailScreen() {
           onPress={() => setPhotoModalVisible(false)}
         >
           <ThemedView style={styles.photoModalContent}>
-            {selectedPhoto && (
-              <Image
-                source={{ uri: selectedPhoto.uri }}
-                style={styles.photoModalImage}
-                contentFit="contain"
+          {selectedPhoto && (
+          <>
+          <Image
+            source={{ uri: selectedPhoto.uri }}
+            style={styles.photoModalImage}
+              contentFit="contain"
               />
-            )}
+              {selectedPhoto.timestamp && (
+                <ThemedView style={styles.photoTimestampContainer}>
+                  <ThemedText style={styles.photoTimestampText}>
+                    {formatTimestamp(selectedPhoto.timestamp)}
+                  </ThemedText>
+                </ThemedView>
+              )}
+            </>
+          )}
             <Pressable 
               style={styles.photoModalCloseButton}
               onPress={() => setPhotoModalVisible(false)}
@@ -652,5 +661,18 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: 'transparent',
     padding: 8,
+  },
+  photoTimestampContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  photoTimestampText: {
+    color: '#FFFFFF',
+    fontSize: 14,
   },
 });
