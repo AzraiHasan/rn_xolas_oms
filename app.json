@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "rn_xolas_oms",
+    "name": "Xolas OMS v0.0.1",
     "slug": "xolas-oms",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "rnxolasoms",
