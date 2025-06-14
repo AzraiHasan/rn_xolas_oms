@@ -125,12 +125,34 @@ export class SyncService {
   }
 
   private async uploadPhotoNative(reportId: string, photoId: string, uri: string): Promise<void> {
-    // Temporary workaround: Skip native uploads and log the attempt
-    console.log(`Native photo upload attempted for ${photoId} - skipping due to technical limitations`);
-    console.log(`Photo would be uploaded from: ${uri}`);
-    
-    // For now, we'll just log that we would upload this photo
-    // This allows the sync to complete successfully while we work on the upload issue
+    try {
+      // Read file info to get the actual file extension and format
+      const fileInfo = await FileSystem.getInfoAsync(uri);
+      console.log(`File info for ${photoId}:`, fileInfo);
+      
+      // Read the file as a blob using fetch (works on React Native)
+      const response = await fetch(uri);
+      const arrayBuffer = await response.arrayBuffer();
+      
+      console.log(`File size: ${arrayBuffer.byteLength} bytes`);
+      
+      // Upload using Supabase storage client with the binary data
+      const { error: uploadError } = await supabase.storage
+        .from('report-photos')
+        .upload(`${reportId}/${photoId}.jpg`, arrayBuffer, {
+          contentType: 'image/jpeg',
+          upsert: true
+        });
+
+      if (uploadError) {
+        throw new Error(`Native upload failed: ${uploadError.message}`);
+      }
+      
+      console.log(`Native photo ${photoId} uploaded successfully using fetch + arrayBuffer`);
+    } catch (error) {
+      console.error(`Native photo upload error for ${photoId}:`, error);
+      throw error;
+    }
   }
 
   private async uploadPhotoWeb(reportId: string, photoId: string, uri: string): Promise<void> {
