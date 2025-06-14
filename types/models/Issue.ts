@@ -71,10 +71,14 @@ export interface IssueReport {
   photos: Photo[];
   /** History of updates to this issue */
   updates?: IssueUpdate[];
+  /** Sync status for backend synchronization */
+  sync_status: 'pending' | 'synced';
+  /** Device identifier for data isolation */
+  device_id: string;
 }
 
 /**
  * Type representing an issue report being created that doesn't yet have an ID
  * Facilitates streamlined creation workflow while maintaining type safety
  */
-export type IssueReportInput = Omit<IssueReport, "id">;
+export type IssueReportInput = Omit<IssueReport, "id" | "sync_status" | "device_id">;
