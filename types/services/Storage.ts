@@ -65,4 +65,11 @@ export interface FileStorageService {
    * @returns Promise resolving to boolean indicating operation success
    */
   deleteImage(uri: string): Promise<boolean>;
+  
+  /**
+   * Retrieves photo data for sync operations
+   * @param photoId Unique identifier of the photo
+   * @returns Promise resolving to photo data or null if not found
+   */
+  getPhotoData(photoId: string): Promise<{ issueId: string; uri: string; title?: string } | null>;
 }
