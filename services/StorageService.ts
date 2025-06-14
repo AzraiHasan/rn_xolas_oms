@@ -10,10 +10,8 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
-// Custom ID generator to replace uuid
-const generateId = () => {
-  return `id_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-};
+import { v4 as uuidv4 } from 'uuid';
+import { getDeviceId } from '../utils/deviceId';
 
 import { 
   IssueReport, 
@@ -69,11 +67,14 @@ export class AsyncStorageIssueService implements IssueStorageService {
   async createIssue(issueInput: IssueReportInput): Promise<IssueReport> {
     try {
       const issues = await this.getAllIssues();
+      const deviceId = await getDeviceId();
       
-      // Create a new issue with a unique ID
+      // Create a new issue with a unique ID and sync fields
       const newIssue: IssueReport = {
         ...issueInput,
-        id: generateId(),
+        id: uuidv4(),
+        sync_status: 'pending',
+        device_id: deviceId,
       };
       
       // Add to the collection and persist
@@ -166,7 +167,7 @@ export class ExpoFileSystemService implements FileStorageService {
       await this.ensureDirectoryExists();
       
       // Generate a unique ID and filename
-      const id = generateId();
+      const id = uuidv4();
       const fileExtension = uri.split('.').pop() || 'jpg';
       const fileName = `${id}.${fileExtension}`;
       const destinationUri = `${this.imagesDirectory}${fileName}`;
